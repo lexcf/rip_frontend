@@ -1,0 +1,478 @@
+html {
+  background-color: #212121;
+  color: white;
+  font-family: "Arial", monospace;
+  font-size: 16px;
+  height: 100%; /* Устанавливаем высоту на всю страницу */
+  width: 100%;
+  overflow-x: hidden; /* Скрыть горизонтальный скролл */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* чтобы растянуть во всю страницу */
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+a:link {
+  color: #fff;
+}
+
+.site-name {
+  font-size: 1.25em;
+  color: white;
+}
+
+.site-name:hover {
+  color: #00A88E;
+}
+
+.current-request:hover {
+  color: #00A88E;
+}
+
+div {
+  width: 100%;
+}
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: auto;
+  background-color: #333;
+  padding: 10px 20px;
+  width: 100%;
+}
+
+
+.cards-list {
+  margin-top: 20px;
+  width: 50%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+
+  row-gap: 40px;
+  column-gap: 100px;
+
+  align-items: stretch;
+  margin-left: 8%;
+}
+
+.card__content {
+  margin-top: 4%;
+  margin-left: 20px;
+  text-decoration: none;
+  color: white;
+}
+
+/* взято частично из https://vuejs.org/partners/ */
+.card {
+  background-color: #1a1a1a;
+  padding-left: 30px;
+  border-radius: 4px;
+  border-color: #555;
+  box-shadow: 0 12px 12px #ffffff0d;
+  display: flex;
+  flex-direction: column;
+  /*width: 100%;*/
+  font-size: 15px;
+  transition: background-color .5s,box-shadow .25s ease,border-color .25s ease;
+
+  border: 1px solid rgba(60, 60, 60, .12);
+
+  height: 30em;
+  width: 105%;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.card:hover {
+  box-shadow: 0 12px 12px #0000001a;
+  border-color: #555
+}
+
+a {
+  text-decoration: none;
+  color: #fff;
+}
+
+.card__name {
+  font-size: 1.75em;
+}
+
+.card__image {
+  flex-basis: 50%;
+  margin-left: 3%;
+  width:360px;
+}
+
+.card:hover .card__name {
+  color: #00A88E;
+}
+
+.card__statistics {
+  margin-top: 20px;
+}
+
+.site-body {
+  margin-top: 40px;
+  margin-left: 15%;
+  margin-right: 15%;
+
+  align-items: center;
+}
+
+.current-request {
+  font-size: 1.25em;
+  margin-bottom: 20px;
+  margin-left: 10px; /* Отступ слева, чтобы отделить от кнопки "Поиск" */
+  text-align: right;
+  white-space: nowrap; /* Запрещает перенос текста на новую строку */
+  color: white;
+}
+
+.search-form {
+  display: flex;
+  gap: 10px;
+  flex-grow: 1;
+  width: 70%;
+  margin-bottom: 20px;
+}
+
+
+.search-button {
+  width: 200px; /* Фиксированная ширина кнопки поиска */
+  font-size: 1em;
+  height: 38px;
+  padding: 3px;
+  margin-left: 30px;
+  background-color: rgb(46, 44, 44);
+  color: white;
+  border: 0;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.search {
+  display: flex;
+  justify-content: space-between; /* Разместим элементы на максимальном расстоянии друг от друга */
+  align-items: center; /* Выравнивание по вертикали */
+  width: 80%;
+  margin-bottom: 20px; /* Отступ снизу */
+}
+
+.search-bar {
+  width: 80%;
+  height: 32px;
+  background-color: rgb(46, 44, 44);
+  padding: 3px;
+  border: 0;
+  border-radius: 3px;
+  color: white;
+}
+
+.search-button:hover {
+  color:#00A88E;
+  transition-duration: .2s;
+  background-color: rgb(41, 39, 39);
+  cursor: pointer;
+}
+
+.search-bar:focus {
+  outline: none !important;
+  border:1px solid black;
+  color: white;
+}
+
+.card__statistics__header {
+  margin-top: 4%;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.card__statistics__item {
+  margin-top: 12px;
+  font-size: 1.1em;
+}
+
+.card_overview {
+  background-color: #1a1a1a;
+  box-shadow: 0 12px 12px #ffffff0d;
+  display: flex;
+  flex-direction: column;
+  font-size: 15px;
+  height: auto;
+  align-items: center;
+  justify-content: center; 
+  text-align: center; 
+}
+
+
+.card__image__description {
+  flex-basis: 50%;
+  max-width:720px;
+  margin-top: 2%;
+  margin-bottom: 2%;
+}
+
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.data-table th, .data-table td {
+  padding: 12px;
+  border: 1px solid #555;
+  text-align: left;
+}
+
+.data-table th {
+  background-color: #333;
+  color: #00A88E;
+  font-size: 1em;
+}
+
+.data-table td {
+  background-color: #1a1a1a;
+  color: white;
+  font-size: 1em;
+}
+
+.data-table tr:nth-child(even) {
+  background-color: #2a2a2a;
+}
+
+.data-table tr:hover {
+  background-color: #333;
+}
+
+.data-table .status {
+  font-weight: bold;
+  color: #00A88E;
+}
+
+
+.cards-list-request {
+  margin-top: 20px;
+}
+
+.card-request {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  max-height: 200px;
+  width: auto;
+}
+
+.card__name-request {
+  text-align: center;
+}
+
+.card__image-request {
+  width: 300px;
+  height: 150px;
+  position: relative;
+  top: -33%;
+}
+
+.card_description-request {
+  text-align: center;
+}
+
+.company_name, .monitoring_cost, .comment {
+  position: relative;
+  top: 60px;  
+  right: -37%;
+  font-size: 1.25em;
+  margin-top: 10px;
+}
+
+.request-table {
+  position: relative;
+  width: 65%;
+  margin-left: 30%;
+  top: 50px;
+  border-collapse: collapse;
+  table-layout: fixed; /* Устанавливаем фиксированное распределение ширины */
+}
+
+.request-table th, .request-table td {
+  border: 1px solid #444343;
+  padding: 8px;
+  overflow: hidden; /* Скрываем переполнение текста */
+  text-overflow: ellipsis; /* Добавляем многоточие для длинного текста */
+  text-align: center; /* Выравнивание содержимого вправо */
+  overflow-wrap: break-word; /* Автоматический перенос слов */
+  word-wrap: break-word; /* Поддержка старых браузеров */
+  white-space: normal; /* Позволяет перенос строк */
+}
+
+.request-table th {
+  background-color: #00A88E;
+}
+
+/* Устанавливаем фиксированную ширину для всех столбцов */
+.request-table th:nth-child(1),
+.request-table td:nth-child(1) {
+  width: 25%; /* Ширина для столбца "Компания" */
+}
+
+.request-table th:nth-child(2),
+.request-table td:nth-child(2) {
+  width: 25%; /* Ширина для столбца "Угроза" */
+}
+
+.request-table th:nth-child(3),
+.request-table td:nth-child(3) {
+  width: 25%; /* Ширина для столбца "Стоимость мониторинга" */
+}
+
+.request-table th:nth-child(4),
+.request-table td:nth-child(4) {
+  width: 25%; /* Ширина для столбца "Комментарий" */
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: auto;
+}
+
+.add-button {
+  width: 90px;
+  font-size: 1em;
+  height: 38px;
+  padding: 3px;
+  margin-bottom: 8%;
+  margin-top: 2%;
+  margin-left: 3%;
+  background-color: rgb(46, 44, 44);
+  color: white;
+  border: 0;
+  border-radius: 3px;
+}
+
+.add-button:hover {
+  color:#00A88E;
+  transition-duration: .2s;
+  background-color: rgb(41, 39, 39);
+  cursor: pointer;
+}
+
+.del-button {
+  margin-top: 3%;
+  width: auto;
+  font-size: 1em;
+  height: 38px;
+  background-color: rgb(46, 44, 44);
+  color: white;
+  border: 0;
+  border-radius: 3px;
+}
+
+.request-buttons {
+  display: flex;
+  justify-content: center; /* Центрируем кнопки по горизонтали */
+  align-items: center;
+  width: 100%; /* Ширина на всю доступную ширину */
+}
+
+.del-button:hover {
+  color:#e22416;
+  transition-duration: .2s;
+  background-color: rgb(41, 39, 39);
+  cursor: pointer;
+}
+
+
+.price-input {
+  width: 120px; /* Ширина для полей ввода цен */
+  height: 32px;
+  background-color: rgb(46, 44, 44);
+  padding: 3px;
+  border: 0;
+  border-radius: 3px;
+  color: white;
+}
+
+.price-input:focus {
+  outline: none !important;
+  border: 1px solid black;
+  color: white;
+}
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white; /* Цвет текста */
+  font-family: "Arial", monospace; /* Шрифт */
+  text-align: center; /* Центрирование текста */
+  padding-top: 10%;
+}
+
+.home-title {
+  font-size: 2.5em; /* Размер заголовка */
+  margin-bottom: 20px; /* Отступ снизу */
+}
+
+.home-description {
+  font-size: 1.2em; /* Размер описания */
+  margin-bottom: 40px; /* Отступ снизу */
+  max-width: 600px; /* Максимальная ширина описания */
+  line-height: 1.5; /* Межстрочный интервал */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.services-button {
+  padding: 10px 20px; /* Отступы внутри кнопки */
+  font-size: 1em; /* Размер шрифта кнопки */
+  background-color: #00A88E; /* Цвет кнопки */
+  color: white; /* Цвет текста на кнопке */
+  border: none; /* Убираем рамку */
+  border-radius: 5px; /* Закругление углов */
+  cursor: pointer; /* Указатель при наведении */
+  transition: background-color 0.3s; /* Плавный переход цвета кнопки */
+}
+
+.services-button:hover {
+  background-color: #008B6B; /* Цвет кнопки при наведении */
+}
+
+.navbar {
+  margin-right: 46.5%;
+}
+.navbar-link {
+  color: white; /* Цвет текста */
+  text-decoration: none; /* Убираем подчеркивание */
+  padding: 10px 15px; /* Отступы для ссылок */
+  transition: background-color 0.3s; /* Плавный переход */
+}
+
+.navbar-link:hover {
+  background-color: #00A88E; /* Цвет фона при наведении */
+}
+
+.breadcrumbs {
+  display: flex;
+  justify-content: center; /* Центрирование */
+  margin-bottom: 20px; /* Отступ снизу */
+  color: white; /* Цвет текста */
+}
+
+.breadcrumbs a {
+  color: #00A88E; /* Цвет ссылок */
+  text-decoration: none; /* Убираем подчеркивание */
+}
+
+.breadcrumbs span {
+  color: white; /* Цвет разделителей */
+}
