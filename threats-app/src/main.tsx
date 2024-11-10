@@ -8,8 +8,9 @@ import ThreatDescription from './DescriptionPage.tsx';
 import HomePage from './HomePage.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.css';
-import './App.css';
+import App from './App.tsx';
 
+ 
 // Создаем маршрутизатор с путями для всех страниц
 const router = createBrowserRouter([
   {
@@ -42,8 +43,6 @@ if ("serviceWorker" in navigator) {
 // Рендерим приложение с провайдером роутера
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Provider store={store}>
-      <RouterProvider router={router} />
-    </Provider>
+    <App />
   </StrictMode>
 );

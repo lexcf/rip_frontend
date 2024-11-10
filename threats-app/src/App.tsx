@@ -1,49 +1,63 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';  // Стили
 import ThreatDescription from './DescriptionPage';
+import HomePage from './HomePage';
+import ThreatsPage from './ThreatsPage';
+import RequestPage from './RequestPage';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import store from './redux/store';
+
+const {invoke} = (window as any).__TAURI__.tauri
 
 function App() {
-  const threat = {
-    name: 'Пример угрозы',
-    description: 'Описание данной угрозы...',
-    count: 5,
-    price: '15000 ₽',
-    img_url: 'http://127.0.0.1:9000/static/network.jpg'
-  };
 
-  const data = {
-    reqId: '12345', // замените на актуальный id
-    currentThreats: [
-      {
-        threat_name: 'Опасность 1',
-        company_name: 'Компания А',
-        price: '1000',
-        comment: 'Комментарий 1',
-        img_url: 'http://127.0.0.1:9000/static/network.jpg',
-      },
-      {
-        threat_name: 'Опасность 2',
-        company_name: 'Компания <',
-        price: '1000',
-        comment: 'Комментарий 1',
-        img_url: 'http://127.0.0.1:9000/static/network.jpg',
-      },
-      {
-        threat_name: 'Опасность 3',
-        company_name: 'Компания D',
-        price: '1000',
-        comment: 'Комментарий 1',
-        img_url: 'http://127.0.0.1:9000/static/network.jpg',
-      },
-    ]
-  };
+  useEffect(() => {
+    invoke('tauri',{cmd:'create'})
+      .then((response: any) => console.log(response))
+      .catch((error: any) => console.log(error))
 
-  return (
-      //<RequestPage reqId={data.reqId} currentThreats={data.currentThreats} />
-      //<MainPage />
+    return () => {
+      invoke('tauri',{cmd:'close'})
+      .then((response: any) => console.log(response))
+      .catch((error: any) => console.log(error))
+    }
+  },[])
 
-      <ThreatDescription threat={threat} />
-  );
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <HomePage />
+    },
+    {
+      path: '/threats',
+      element: <ThreatsPage />
+    },
+    {
+      path: '/requests/:reqId',
+      element: <RequestPage />
+    },
+    {
+      path: '/description/:threatId',
+      element: <ThreatDescription />
+    }
+  ], { basename: '/rip_frontend' });
+  
+  
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function() {
+      navigator.serviceWorker
+        .register("/rip_frontend/serviceWorker.js")
+        .then(res => console.log("service worker registered"))
+        .catch(err => console.log("service worker not registered", err))
+    })
+  }
+
+    return (
+      <Provider store={store}>
+        <RouterProvider router={router} />
+      </Provider>
+    );
 }
 
 export default App;
