@@ -1,9 +1,10 @@
+/* eslint-disable */
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: "/frontend_rip"
+  base: "/rip_frontend",
   server: {
     proxy: {
       "/api": {
@@ -13,5 +14,5 @@ export default defineConfig({
       },
     },
     port: 3000
-  },
+  }
 });

@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
+import { Provider } from 'react-redux';
+import store from './redux/store.tsx';
 import MainPage from './ThreatsPage.tsx';
 import RequestPage from './RequestPage.tsx';
 import ThreatDescription from './DescriptionPage.tsx';
@@ -27,11 +28,13 @@ const router = createBrowserRouter([
     path: '/description/:threatId',
     element: <ThreatDescription />
   }
-], { basename: '/ThreatsMonitoringApp' });
+], { basename: '/rip_frontend' });
 
 // Рендерим приложение с провайдером роутера
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </StrictMode>
 );

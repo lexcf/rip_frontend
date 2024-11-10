@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/Breadcrumbs.tsx","./src/DescriptionPage.tsx","./src/HomePage.tsx","./src/Navbar.tsx","./src/RequestPage.tsx","./src/ThreatsPage.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/redux/store.tsx","./src/redux/threatsSlice.tsx"],"errors":true,"version":"5.6.3"}

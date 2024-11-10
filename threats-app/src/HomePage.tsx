@@ -1,3 +1,4 @@
+/* eslint-disable */
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Navbar from './Navbar';
 import { Carousel } from 'react-bootstrap';
@@ -18,8 +19,6 @@ export default function HomePage() {
         <p className="lead mt-3 mb-5">
         Данный ресурс предназначен для поиска ит-угроз и формирования заявок на мониторинг выбранных ИТ-угроз <br />и включает в себя веб-сервис, веб-приложение, десктопное приложения.
         </p>
-        <a href="/threats" className="btn btn-success btn-lg mb-5">Список услуг</a>
-
         {/* Карусель с изображениями */}
         <Carousel className="w-75" indicators={false} controls={true}>
           <Carousel.Item>
