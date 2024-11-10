@@ -8,7 +8,7 @@ const Breadcrumbs = () => {
 
   const breadcrumbsMapping = {
     '': 'Главная',
-    'main': 'Услуги',
+    'threats': 'Угрозы',
     'requests': 'Заявки',
     'description': 'Описание'
   };

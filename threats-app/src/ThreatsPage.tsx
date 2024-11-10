@@ -12,7 +12,7 @@ const mockThreats = [
   { pk: 3, threat_name: 'Угроза 3', short_description: 'Описание угрозы 3', img_url: defaultImageUrl },
 ];
 
-const MainPage = () => {
+const ThreatsPage = () => {
   const [inputValue, setInputValue] = useState('');
   const [priceFrom, setPriceFrom] = useState('');
   const [priceTo, setPriceTo] = useState('');
@@ -167,4 +167,4 @@ const MainPage = () => {
   );
 };
 
-export default MainPage;
+export default ThreatsPage;

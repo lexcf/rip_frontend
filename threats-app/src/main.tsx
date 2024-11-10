@@ -1,9 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
-import MainPage from './mainPage';
+import MainPage from './ThreatsPage.tsx';
 import RequestPage from './requestPage';
-import ThreatDescription from './descriptionPage';
+import ThreatDescription from './DescriptionPage.tsx';
 import HomePage from './homePage.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './index.css';
@@ -16,7 +16,7 @@ const router = createBrowserRouter([
     element: <HomePage />
   },
   {
-    path: '/main',
+    path: '/threats',
     element: <MainPage />
   },
   {

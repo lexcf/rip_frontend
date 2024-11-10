@@ -16,7 +16,7 @@ export default function HomePage() {
         <p className="lead mt-3 mb-5">
           Данный ресурс предназначен для мониторинга событий безопасности в компании.
         </p>
-        <a href="/main" className="btn btn-success btn-lg">Список услуг</a>
+        <a href="/threats" className="btn btn-success btn-lg">Список услуг</a>
       </main>
     </div>
   );

@@ -1,8 +1,6 @@
 import React from 'react';
 import './App.css';  // Стили
-import MainPage from './mainPage';  // Импортируем компонент
-import RequestPage from './requestPage';
-import ThreatDescription from './descriptionPage';
+import ThreatDescription from './DescriptionPage';
 
 function App() {
   const threat = {
