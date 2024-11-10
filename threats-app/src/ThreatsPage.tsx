@@ -6,7 +6,13 @@ import { setThreats, setFilteredThreats, setInputValue, setPriceFrom, setPriceTo
 import Breadcrumbs from './Breadcrumbs';
 import Navbar from './Navbar';
 
-const defaultImageUrl = '/static/network.jpg';
+const defaultImageUrl = '/rip_frontend/static/network.jpg';
+
+const mockThreats = [
+  { pk: 1, threat_name: 'Угроза 1', short_description: 'Описание угрозы 1', img_url: defaultImageUrl },
+  { pk: 2, threat_name: 'Угроза 2', short_description: 'Описание угрозы 2', img_url: defaultImageUrl },
+  { pk: 3, threat_name: 'Угроза 3', short_description: 'Описание угрозы 3', img_url: defaultImageUrl },
+];
 
 const ThreatsPage = () => {
   const { inputValue, priceFrom, priceTo, threats, filteredThreats, currentRequestId, currentCount } = useSelector((state) => state.threats);
@@ -16,7 +22,7 @@ const ThreatsPage = () => {
   useEffect(() => {
     const fetchThreats = async () => {
       try {
-        const response = await fetch('http://localhost:8000/threats/');
+        const response = await fetch('http://localhost:8000/threats/',{ signal: AbortSignal.timeout(2000) });
         const threatsData = await response.json();
         const filteredData = threatsData.filter(item => item.pk !== undefined);
         const requestData = threatsData.find(item => item.request);
@@ -25,7 +31,7 @@ const ThreatsPage = () => {
         dispatch(setCurrentCount(requestData?.request?.threats_amount || 0));
       } catch (error) {
         console.error('Ошибка при загрузке данных угроз:', error);
-        dispatch(setThreats([]));
+        dispatch(setThreats(mockThreats));
       }
     };
     fetchThreats();
@@ -34,7 +40,7 @@ const ThreatsPage = () => {
   const handleSearchSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:8000/threats/?name=${inputValue}&price_from=${priceFrom}&price_to=${priceTo}`);
+      const response = await fetch(`http://localhost:8000/threats/?name=${inputValue}&price_from=${priceFrom}&price_to=${priceTo}`, { signal: AbortSignal.timeout(2000) });
       const result = await response.json();
       //const filteredResult = result.filter(item => item.pk !== undefined);
       dispatch(setFilteredThreats(filteredResult));
@@ -60,7 +66,7 @@ const ThreatsPage = () => {
   return (
     <div className="container-fluid bg-dark text-light min-vh-100">
       <header className="d-flex justify-content-between align-items-center px-5 py-3" style={{ backgroundColor: '#333', height: '70%', maxHeight: '60px', width: '1990px', marginLeft:'-30px' }}>
-        <a href="/" className="text-light fs-4">Мониторинг угроз</a>
+        <Link to="/" className="text-light fs-4">Мониторинг угроз</Link>
         <Navbar />
       </header>
 

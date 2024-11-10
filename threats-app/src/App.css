@@ -489,3 +489,173 @@ a {
   text-align: center
   padding: 0 15px; 
 }
+
+/* Общее адаптивное правило для уменьшения шрифтов и отступов */
+@media (max-width: 1200px) {
+  .site-header {
+    padding: 8px 15px;
+  }
+  .home-title {
+    font-size: 2em;
+  }
+  .home-description {
+    font-size: 1em;
+    max-width: 500px;
+  }
+  .navbar {
+    margin-right: 30%;
+  }
+}
+
+@media (max-width: 992px) {
+  .navbar {
+    flex-direction: column;
+    margin-right: 0;
+  }
+  .navbar-link {
+    padding: 8px 10px;
+  }
+  .carousel-item img {
+    height: 300px;
+  }
+  .home-description {
+    max-width: 80%;
+  }
+  .request-table {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-item img {
+    height: 250px;
+  }
+  .container-fluid {
+    padding: 0 15px;
+  }
+  .home-title {
+    font-size: 1.5em;
+  }
+  .home-description {
+    font-size: 0.9em;
+  }
+  .card {
+    height: auto;
+    width: 100%;
+    padding: 10px;
+  }
+  .card__image {
+    width: 100%;
+    height: auto;
+    margin-left: 0;
+  }
+  .request-table th, .request-table td {
+    width: auto;
+  }
+  .cards-list {
+    width: 100%;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .navbar {
+    display: flex;           /* Выравниваем ссылки по горизонтали */
+    flex-direction: row;
+    margin-right: 80%;
+  }
+  
+  .navbar-link {
+    color: white;            /* Цвет текста */
+    text-decoration: none;   /* Убираем подчеркивание */
+    padding: 10px 15px;      /* Отступы для ссылок */
+    transition: background-color 0.3s; /* Плавный переход при наведении */
+  }
+  
+  .navbar-link:hover {
+    background-color: #00A88E; /* Цвет фона при наведении */
+  }
+}
+
+.card-img {
+  margin-left: 40%
+}
+
+@media (max-width: 768px) {
+  /* Основные настройки для контейнера */
+  .container-fluid {
+    background-color: #333;
+    color: #fff;
+    min-height: 100vh;
+    padding: 0;
+  }
+  
+  /* Breadcrumbs адаптивность */
+  .breadcrumbs {
+    margin: 10px 20px;
+  }
+
+  /* Форма поиска */
+  form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 20px;
+  }
+
+  form .col {
+    flex: 1 1 auto;
+  }
+
+  form .col-auto {
+    flex: 0 0 auto;
+  }
+
+  form .form-control {
+    width: 100%;
+  }
+
+  form .btn, form .col-auto a {
+    min-width: 100px;
+  }
+
+  /* Адаптивные карточки */
+  .container .row {
+    margin: 20px 0;
+  }
+
+  .card {
+    background-color: #444;
+    color: #fff;
+    border: 1px solid #555;
+    transition: transform 0.2s;
+  }
+
+  .card:hover {
+    transform: scale(1.02);
+  }
+
+  .card-img-top {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    padding-left: 2em;
+  }
+
+  .card-body {
+    padding: 10px;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+  }
+
+  .card-text {
+    font-size: 1rem;
+  }
+
+  .card-img {
+    margin-left: 12%;
+  }
+}
+

@@ -5,7 +5,7 @@ import Navbar from './Navbar';
 import Breadcrumbs from './Breadcrumbs';
 
 
-const defaultImageUrl = '/static/network.jpg';
+const defaultImageUrl = '/rip_frontend/static/network.jpg';
 // Мок-данные для угроз
 const mockThreats = [
   {
@@ -44,7 +44,7 @@ const ThreatDescription = () => {
   useEffect(() => {
     const fetchThreat = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/threats/detail/${threatId}/`);
+        const response = await fetch(`http://localhost:8000/threats/detail/${threatId}/`,{ signal: AbortSignal.timeout(2000) });
         
         if (!response.ok) {
           throw new Error('Ошибка при загрузке данных');
@@ -112,7 +112,7 @@ const ThreatDescription = () => {
               <img 
                 src={threat.img_url || defaultImageUrl} 
                 alt={threat.threat_name} 
-                className="img-fluid rounded-start"  style={{ height:'210px',marginTop:'10px',marginLeft:'40%' }}
+                className="img-fluid rounded-start card-img"  style={{ height:'210px',width:'auto',marginTop:'10px' }}
               />
             </div>
           </div>

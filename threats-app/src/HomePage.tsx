@@ -24,21 +24,21 @@ export default function HomePage() {
           <Carousel.Item>
             <img
               className="d-block w-100"
-              src="http://127.0.0.1:9000/static/web.jpg"
+              src="/rip_frontend/static/web.jpg"
               alt="Первое изображение"
             />
           </Carousel.Item>
           <Carousel.Item>
             <img
               className="d-block w-100"
-              src="http://127.0.0.1:9000/static/ddos.jpg"
+              src="/rip_frontend/static/ddos.jpg"
               alt="Второе изображение"
             />
           </Carousel.Item>
           <Carousel.Item>
             <img
               className="d-block w-100"
-              src="http://127.0.0.1:9000/static/vulnerability.jpg"
+              src="/rip_frontend/static/vulnerability.jpg"
               alt="Третье изображение"
             />
           </Carousel.Item>
