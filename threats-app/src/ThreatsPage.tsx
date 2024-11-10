@@ -1,25 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate, Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { setThreats, setFilteredThreats, setInputValue, setPriceFrom, setPriceTo, setCurrentRequestId, setCurrentCount } from './redux/threatsSlice';
 import Breadcrumbs from './Breadcrumbs';
 import Navbar from './Navbar';
 
 const defaultImageUrl = '/static/network.jpg';
 
-const mockThreats = [
-  { pk: 1, threat_name: 'Угроза 1', short_description: 'Описание угрозы 1', img_url: defaultImageUrl },
-  { pk: 2, threat_name: 'Угроза 2', short_description: 'Описание угрозы 2', img_url: defaultImageUrl },
-  { pk: 3, threat_name: 'Угроза 3', short_description: 'Описание угрозы 3', img_url: defaultImageUrl },
-];
-
 const ThreatsPage = () => {
-  const [inputValue, setInputValue] = useState('');
-  const [priceFrom, setPriceFrom] = useState('');
-  const [priceTo, setPriceTo] = useState('');
-  const [threats, setThreats] = useState(mockThreats);
-  const [filteredThreats, setFilteredThreats] = useState(mockThreats);
-  const [currentRequestId, setCurrentRequestId] = useState(null);
-  const [currentCount, setCurrentCount] = useState(0);
+  const { inputValue, priceFrom, priceTo, threats, filteredThreats, currentRequestId, currentCount } = useSelector((state) => state.threats);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,21 +20,16 @@ const ThreatsPage = () => {
         const threatsData = await response.json();
         const filteredData = threatsData.filter(item => item.pk !== undefined);
         const requestData = threatsData.find(item => item.request);
-        setThreats(filteredData);
-        setFilteredThreats(filteredData);
-        setCurrentRequestId(requestData?.request?.pk || null);
-        setCurrentCount(requestData?.request?.threats_amount || 0);
+        dispatch(setThreats(filteredData));
+        dispatch(setCurrentRequestId(requestData?.request?.pk || null));
+        dispatch(setCurrentCount(requestData?.request?.threats_amount || 0));
       } catch (error) {
         console.error('Ошибка при загрузке данных угроз:', error);
-        setThreats(mockThreats);
-        setFilteredThreats(mockThreats);
-        const requestData = mockThreats.find(item => item.request);
-        setCurrentRequestId(requestData?.request?.pk || null);
-        setCurrentCount(requestData?.request?.threats_amount || 0);
+        dispatch(setThreats([])); // Если ошибка, можем установить пустой массив
       }
     };
     fetchThreats();
-  }, []);
+  }, [dispatch]);
 
   const handleSearchSubmit = async (e) => {
     e.preventDefault();
@@ -51,7 +37,7 @@ const ThreatsPage = () => {
       const response = await fetch(`/api/threats/?name=${inputValue}&price_from=${priceFrom}&price_to=${priceTo}`);
       const result = await response.json();
       const filteredResult = result.filter(item => item.pk !== undefined);
-      setFilteredThreats(filteredResult);
+      dispatch(setFilteredThreats(filteredResult));
     } catch (error) {
       console.error('Ошибка при выполнении поиска:', error);
     }
@@ -71,20 +57,15 @@ const ThreatsPage = () => {
     }
   };
 
-
-
   return (
     <div className="container-fluid bg-dark text-light min-vh-100">
-      {/* Шапка */}
       <header className="d-flex justify-content-between align-items-center px-5 py-3" style={{ backgroundColor: '#333', height: '70%', maxHeight: '60px', width: '1990px', marginLeft:'-30px' }}>
         <a href="/" className="text-light fs-4">Мониторинг угроз</a>
         <Navbar />
       </header>
 
-      {/* Навигация */}
       <Breadcrumbs />
 
-      {/* Форма поиска */}
       <div className="container my-4">
         <form onSubmit={handleSearchSubmit} className="row g-3 align-items-center">
           <div className="col">
@@ -93,7 +74,7 @@ const ThreatsPage = () => {
               className="form-control"
               placeholder="Имя угрозы"
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
+              onChange={(e) => dispatch(setInputValue(e.target.value))}
             />
           </div>
           <div className="col">
@@ -102,7 +83,7 @@ const ThreatsPage = () => {
               className="form-control"
               placeholder="Цена от"
               value={priceFrom}
-              onChange={(e) => setPriceFrom(e.target.value)}
+              onChange={(e) => dispatch(setPriceFrom(e.target.value))}
             />
           </div>
           <div className="col">
@@ -111,7 +92,7 @@ const ThreatsPage = () => {
               className="form-control"
               placeholder="Цена до"
               value={priceTo}
-              onChange={(e) => setPriceTo(e.target.value)}
+              onChange={(e) => dispatch(setPriceTo(e.target.value))}
             />
           </div>
           <div className="col-auto">
@@ -121,7 +102,7 @@ const ThreatsPage = () => {
             <a
               href={`/requests/${currentRequestId}`}
               className="btn btn-outline-success"
-              style={{ marginLeft: '10px' }} // Добавлен отступ слева
+              style={{ marginLeft: '10px' }}
             >
               Текущая заявка ({currentCount})
             </a>
@@ -129,7 +110,6 @@ const ThreatsPage = () => {
         </form>
       </div>
 
-      {/* Список угроз */}
       <div className="container">
         <div className="row row-cols-1 row-cols-md-3 g-4">
           {filteredThreats.map((threat) => (

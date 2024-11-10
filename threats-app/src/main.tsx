@@ -6,6 +6,8 @@ import RequestPage from './RequestPage.tsx';
 import ThreatDescription from './DescriptionPage.tsx';
 import HomePage from './HomePage.tsx';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import store from './redux/store';  // Импортируйте ваш store
 import './index.css';
 import './App.css';
 
@@ -29,9 +31,11 @@ const router = createBrowserRouter([
   }
 ]);
 
-// Рендерим приложение с провайдером роутера
+// Рендерим приложение с провайдером роутера и Redux
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}> {/* Оборачиваем RouterProvider в Provider */}
+      <RouterProvider router={router} />
+    </Provider>
   </StrictMode>
 );
