@@ -6,5 +6,5 @@
 
 Смежные репозитории:
 
-фронтенд (React, Vite) : https://github.com/lexcf/rip_frontend
-бэкенд (Pyhton, Django) : https://github.com/lexcf/bmstu_rip_1
+- фронтенд (React, Vite) : https://github.com/lexcf/rip_frontend
+- бэкенд (Pyhton, Django) : https://github.com/lexcf/bmstu_rip_1
