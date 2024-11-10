@@ -30,6 +30,15 @@ const router = createBrowserRouter([
   }
 ], { basename: '/rip_frontend' });
 
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function() {
+    navigator.serviceWorker
+      .register("/rip_frontend/serviceWorker.js")
+      .then(res => console.log("service worker registered"))
+      .catch(err => console.log("service worker not registered", err))
+  })
+}
 // Рендерим приложение с провайдером роутера
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
