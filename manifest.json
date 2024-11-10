@@ -1,7 +1,7 @@
 {
     "name": "Мониторинг ИТ-угроз",
     "short_name": "Мониторинг ИТ-угроз",
-    "start_url": "/",
+    "start_url": "/rip_frontend",
     "display": "standalone",
     "background_color": "#fdfdfd",
     "theme_color": "#db4938",
