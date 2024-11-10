@@ -82,7 +82,7 @@ const ThreatDescription = () => {
     <div className="container-fluid bg-dark text-light min-vh-100">
       {/* Шапка */}
       <header className="d-flex justify-content-between align-items-center px-5 py-3" style={{ backgroundColor: '#333', height: '70%', maxHeight: '60px', width: '1990px', marginLeft:'-30px' }}>
-        <a href="/" className="text-light fs-4">Мониторинг угроз</a>
+        <a href="/rip_frontend" className="text-light fs-4">Мониторинг угроз</a>
         <Navbar />
       </header>
       
