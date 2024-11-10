@@ -25,7 +25,7 @@ const ThreatsPage = () => {
         dispatch(setCurrentCount(requestData?.request?.threats_amount || 0));
       } catch (error) {
         console.error('Ошибка при загрузке данных угроз:', error);
-        dispatch(setThreats([])); // Если ошибка, можем установить пустой массив
+        dispatch(setThreats([]));
       }
     };
     fetchThreats();
@@ -36,7 +36,7 @@ const ThreatsPage = () => {
     try {
       const response = await fetch(`/api/threats/?name=${inputValue}&price_from=${priceFrom}&price_to=${priceTo}`);
       const result = await response.json();
-      const filteredResult = result.filter(item => item.pk !== undefined);
+      //const filteredResult = result.filter(item => item.pk !== undefined);
       dispatch(setFilteredThreats(filteredResult));
     } catch (error) {
       console.error('Ошибка при выполнении поиска:', error);
