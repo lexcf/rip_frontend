@@ -476,3 +476,16 @@ a {
 .breadcrumbs span {
   color: white; /* Цвет разделителей */
 }
+
+
+/* Это CSS стили для вашего проекта */
+.carousel-item img {
+  object-fit: cover;  /* Обеспечивает, чтобы изображение не искажалось */
+  height: 400px;
+}
+
+.carousel-caption {
+  bottom: 20px;
+  text-align: center
+  padding: 0 15px; 
+}
