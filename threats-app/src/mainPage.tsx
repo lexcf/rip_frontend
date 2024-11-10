@@ -4,10 +4,12 @@ import { useNavigate, Link } from 'react-router-dom';
 import Breadcrumbs from './Breadcrumbs';
 import Navbar from './Navbar';
 
+const defaultImageUrl = '/static/network.jpg';
+
 const mockThreats = [
-  { pk: 1, threat_name: 'Угроза 1', short_description: 'Описание угрозы 1', img_url: 'http://127.0.0.1:9000/static/web.jpg' },
-  { pk: 2, threat_name: 'Угроза 2', short_description: 'Описание угрозы 2', img_url: 'http://127.0.0.1:9000/static/ddos.jpg' },
-  { pk: 3, threat_name: 'Угроза 3', short_description: 'Описание угрозы 3', img_url: 'http://127.0.0.1:9000/static/vulnerability.jpg' },
+  { pk: 1, threat_name: 'Угроза 1', short_description: 'Описание угрозы 1', img_url: defaultImageUrl },
+  { pk: 2, threat_name: 'Угроза 2', short_description: 'Описание угрозы 2', img_url: defaultImageUrl },
+  { pk: 3, threat_name: 'Угроза 3', short_description: 'Описание угрозы 3', img_url: defaultImageUrl },
 ];
 
 const MainPage = () => {
@@ -69,7 +71,7 @@ const MainPage = () => {
     }
   };
 
-  const defaultImageUrl = 'http://127.0.0.1:9000/static/network.jpg';
+
 
   return (
     <div className="container-fluid bg-dark text-light min-vh-100">

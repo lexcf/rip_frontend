@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Navbar from './Navbar';
 import Breadcrumbs from './Breadcrumbs';
 
+
+const defaultImageUrl = '/static/network.jpg';
 // Мок-данные для угроз
 const mockThreats = [
   {
@@ -12,7 +14,7 @@ const mockThreats = [
     description: 'Подробное описание угрозы 1.',
     detections: 5,
     price: 1500,
-     img_url: 'http://127.0.0.1:9000/static/web.jpg'
+     img_url: defaultImageUrl
   },
   {
     pk: 2,
@@ -20,7 +22,7 @@ const mockThreats = [
     description: 'Подробное описание угрозы 2.',
     detections: 3,
     price: 2000,
-    img_url: 'http://127.0.0.1:9000/static/ddos.jpg'
+    img_url: defaultImageUrl
   },
   {
     pk: 3,
@@ -28,11 +30,10 @@ const mockThreats = [
     description: 'Подробное описание угрозы 3.',
     detections: 10,
     price: 1200,
-     img_url: 'http://127.0.0.1:9000/static/vulnerability.jpg'
+     img_url: defaultImageUrl
   },
 ];
 
-const defaultImageUrl = 'http://127.0.0.1:9000/static/network.jpg';
 
 const ThreatDescription = () => {
   const { threatId } = useParams();

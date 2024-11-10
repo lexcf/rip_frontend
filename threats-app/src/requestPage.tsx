@@ -36,7 +36,7 @@ const mockRequests = [
   },
 ];
 
-const defaultImageUrl = 'http://127.0.0.1:9000/static/network.jpg';
+const defaultImageUrl = '/static/network.jpg';
 
 const RequestPage = () => {
   const { reqId } = useParams();
