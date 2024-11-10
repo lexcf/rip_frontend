@@ -16,7 +16,7 @@ const ThreatsPage = () => {
   useEffect(() => {
     const fetchThreats = async () => {
       try {
-        const response = await fetch('/api/threats/');
+        const response = await fetch('http://localhost:8000/threats/');
         const threatsData = await response.json();
         const filteredData = threatsData.filter(item => item.pk !== undefined);
         const requestData = threatsData.find(item => item.request);
@@ -34,7 +34,7 @@ const ThreatsPage = () => {
   const handleSearchSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/threats/?name=${inputValue}&price_from=${priceFrom}&price_to=${priceTo}`);
+      const response = await fetch(`http://localhost:8000/threats/?name=${inputValue}&price_from=${priceFrom}&price_to=${priceTo}`);
       const result = await response.json();
       //const filteredResult = result.filter(item => item.pk !== undefined);
       dispatch(setFilteredThreats(filteredResult));
