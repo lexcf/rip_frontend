@@ -20,22 +20,24 @@ const ThreatsPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchThreats = async () => {
-      try {
-        const response = await fetch('http://localhost:8000/threats/',{ signal: AbortSignal.timeout(2000) });
-        const threatsData = await response.json();
-        const filteredData = threatsData.filter(item => item.pk !== undefined);
-        const requestData = threatsData.find(item => item.request);
-        dispatch(setThreats(filteredData));
-        dispatch(setCurrentRequestId(requestData?.request?.pk || null));
-        dispatch(setCurrentCount(requestData?.request?.threats_amount || 0));
-      } catch (error) {
-        console.error('Ошибка при загрузке данных угроз:', error);
-        dispatch(setThreats(mockThreats));
-      }
-    };
-    fetchThreats();
-  }, [dispatch]);
+    if (threats.length === 0) {
+      const fetchThreats = async () => {
+        try {
+          const response = await fetch('http://localhost:8000/threats/', { signal: AbortSignal.timeout(2000) });
+          const threatsData = await response.json();
+          const filteredData = threatsData.filter(item => item.pk !== undefined);
+          const requestData = threatsData.find(item => item.request);
+          dispatch(setThreats(filteredData));
+          dispatch(setCurrentRequestId(requestData?.request?.pk || null));
+          dispatch(setCurrentCount(requestData?.request?.threats_amount || 0));
+        } catch (error) {
+          console.error('Ошибка при загрузке данных угроз:', error);
+          dispatch(setThreats(mockThreats));
+        }
+      };
+      fetchThreats();
+    }
+  }, [dispatch, threats]);
 
   const handleSearchSubmit = async (e) => {
     e.preventDefault();
