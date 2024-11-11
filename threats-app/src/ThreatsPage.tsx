@@ -43,7 +43,7 @@ const ThreatsPage = () => {
       const response = await fetch(`http://localhost:8000/threats/?name=${inputValue}&price_from=${priceFrom}&price_to=${priceTo}`, { signal: AbortSignal.timeout(2000) });
       const result = await response.json();
       const filteredResult = result.filter(item => item.pk !== undefined);
-      dispatch(setFilteredThreats(filteredResult));
+      dispatch(setThreats(filteredResult));
     } catch (error) {
       console.error('Ошибка при выполнении поиска:', error);
 
@@ -57,7 +57,7 @@ const ThreatsPage = () => {
       });
 
       console.log(filteredLocalThreats)
-      dispatch(setFilteredThreats(filteredLocalThreats));
+      dispatch(setThreats(filteredLocalThreats));
       }
   };
 
