@@ -77,7 +77,6 @@ div {
   box-shadow: 0 12px 12px #ffffff0d;
   display: flex;
   flex-direction: column;
-  /*width: 100%;*/
   font-size: 15px;
   transition: background-color .5s,box-shadow .25s ease,border-color .25s ease;
 
@@ -450,6 +449,7 @@ a {
 .navbar {
   margin-right: 46.5%;
 }
+
 .navbar-link {
   color: white; /* Цвет текста */
   text-decoration: none; /* Убираем подчеркивание */
@@ -490,112 +490,38 @@ a {
   padding: 0 15px; 
 }
 
-/* Общее адаптивное правило для уменьшения шрифтов и отступов */
-@media (max-width: 1200px) {
-  .site-header {
-    padding: 8px 15px;
-  }
-  .home-title {
-    font-size: 2em;
-  }
-  .home-description {
-    font-size: 1em;
-    max-width: 500px;
-  }
-  .navbar {
-    margin-right: 30%;
-  }
-}
-
-@media (max-width: 992px) {
-  .navbar {
-    flex-direction: column;
-    margin-right: 0;
-  }
-  .navbar-link {
-    padding: 8px 10px;
-  }
-  .carousel-item img {
-    height: 300px;
-  }
-  .home-description {
-    max-width: 80%;
-  }
-  .request-table {
-    width: 100%;
-    margin-left: 0;
-  }
-}
-
-@media (max-width: 768px) {
-  .carousel-item img {
-    height: 250px;
-  }
-  .container-fluid {
-    padding: 0 15px;
-  }
-  .home-title {
-    font-size: 1.5em;
-  }
-  .home-description {
-    font-size: 0.9em;
-  }
-  .card {
-    height: auto;
-    width: 100%;
-    padding: 10px;
-  }
-  .card__image {
-    width: 100%;
-    height: auto;
-    margin-left: 0;
-  }
-  .request-table th, .request-table td {
-    width: auto;
-  }
-  .cards-list {
-    width: 100%;
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-
-  .navbar {
-    display: flex;           /* Выравниваем ссылки по горизонтали */
-    flex-direction: row;
-    margin-right: 80%;
-  }
-  
-  .navbar-link {
-    color: white;            /* Цвет текста */
-    text-decoration: none;   /* Убираем подчеркивание */
-    padding: 10px 15px;      /* Отступы для ссылок */
-    transition: background-color 0.3s; /* Плавный переход при наведении */
-  }
-  
-  .navbar-link:hover {
-    background-color: #00A88E; /* Цвет фона при наведении */
-  }
-}
-
 .card-img {
   margin-left: 40%
 }
 
 @media (max-width: 768px) {
-  /* Основные настройки для контейнера */
-  .container-fluid {
-    background-color: #333;
-    color: #fff;
-    min-height: 100vh;
-    padding: 0;
+  .navbar {
+    display: flex;
+    flex-direction: row;
+    margin-right: 80%;
+  }
+
+  .navbar-link {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    transition: background-color 0.3s;
   }
   
-  /* Breadcrumbs адаптивность */
+  .navbar-link:hover {
+    background-color: #00A88E;
+  }
+
+
+  .card {
+    height: auto;
+    width: 100%;
+  }
+
   .breadcrumbs {
     margin: 10px 20px;
   }
 
-  /* Форма поиска */
   form {
     display: flex;
     flex-wrap: wrap;
@@ -619,10 +545,43 @@ a {
     min-width: 100px;
   }
 
-  /* Адаптивные карточки */
   .container .row {
     margin: 20px 0;
   }
+
+}
+/*
+@media (max-width: 768px) {
+  
+  
+  
+  .request-table th, .request-table td {
+    width: auto;
+  }
+  .cards-list {
+    width: 100%;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+@mediamax)
+  
+  
+  
+}
+
+
+
+@media (max-width: 768px) {
+  .container-fluid {
+    background-color: #333;
+    color: #fff;
+    min-height: 100vh;
+    padding: 0;
+  }
+  
+  
+
+  
 
   .card {
     background-color: #444;
@@ -657,5 +616,4 @@ a {
   .card-img {
     margin-left: 12%;
   }
-}
-
+}*/
