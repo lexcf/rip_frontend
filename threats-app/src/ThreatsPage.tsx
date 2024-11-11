@@ -9,9 +9,9 @@ import Navbar from './Navbar';
 const defaultImageUrl = '/rip_frontend/static/network.jpg';
 
 const mockThreats = [
-  { pk: 1, threat_name: 'Угроза 1', short_description: 'Описание угрозы 1', img_url: defaultImageUrl },
-  { pk: 2, threat_name: 'Угроза 2', short_description: 'Описание угрозы 2', img_url: defaultImageUrl },
-  { pk: 3, threat_name: 'Угроза 3', short_description: 'Описание угрозы 3', img_url: defaultImageUrl },
+  { pk: 1, threat_name: 'Угроза 1', short_description: 'Описание угрозы 1', img_url: defaultImageUrl, price: 10000 },
+  { pk: 2, threat_name: 'Угроза 2', short_description: 'Описание угрозы 2', img_url: defaultImageUrl, price: 20000 },
+  { pk: 3, threat_name: 'Угроза 3', short_description: 'Описание угрозы 3', img_url: defaultImageUrl, price: 14000 },
 ];
 
 const ThreatsPage = () => {
@@ -42,11 +42,23 @@ const ThreatsPage = () => {
     try {
       const response = await fetch(`http://localhost:8000/threats/?name=${inputValue}&price_from=${priceFrom}&price_to=${priceTo}`, { signal: AbortSignal.timeout(2000) });
       const result = await response.json();
-      //const filteredResult = result.filter(item => item.pk !== undefined);
+      const filteredResult = result.filter(item => item.pk !== undefined);
       dispatch(setFilteredThreats(filteredResult));
     } catch (error) {
       console.error('Ошибка при выполнении поиска:', error);
-    }
+
+      const filteredLocalThreats = mockThreats.filter(threat => {
+        const matchesName = inputValue
+          ? threat.threat_name.toLowerCase().includes(inputValue.toLowerCase())
+          : true;
+        const matchesPriceFrom = priceFrom ? threat.price >= priceFrom : true;
+        const matchesPriceTo = priceTo ? threat.price <= priceTo : true;
+        return matchesName && matchesPriceFrom && matchesPriceTo;
+      });
+
+      console.log(filteredLocalThreats)
+      dispatch(setFilteredThreats(filteredLocalThreats));
+      }
   };
 
   const handleAddThreat = async (threatId) => {
