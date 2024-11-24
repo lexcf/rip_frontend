@@ -27,8 +27,14 @@ const LoginPage = () => {
       });
 
       if (response.ok) {
+        const data = await response.json()
+        let is_staff = false;
+        if(data.staff == true) {
+          is_staff = true;
+        }
+        
         // После успешного входа мы передаем username в Redux, а не из ответа сервера
-        dispatch(login({ username })); // Авторизуем пользователя
+        dispatch(login({ username, is_staff })); // Авторизуем пользователя
         navigate('/threats'); // После успешного входа перенаправляем на страницу угроз
       } else {
         const errorData = await response.json();

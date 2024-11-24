@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import './App.css';
 import Navbar from './Navbar';
 import Breadcrumbs from './Breadcrumbs';
+import Cookies from 'js-cookie';
+import { useSelector, useDispatch } from 'react-redux';
+import { setCurrentRequestId, setCurrentCount } from './redux/threatsSlice';
 
 // Мок-данные для заявок
 const mockRequests = [
@@ -22,6 +26,7 @@ const mockRequests = [
         short_description: 'Краткое описание угрозы 2.',
       },
     ],
+    status: 'draft',
   },
   {
     reqId: '2',
@@ -33,6 +38,7 @@ const mockRequests = [
         short_description: 'Краткое описание угрозы 3.',
       },
     ],
+    status: 'approved',
   },
 ];
 
@@ -43,34 +49,33 @@ const RequestPage = () => {
   const [currentThreats, setCurrentThreats] = useState([]);
   const [loading, setLoading] = useState(true); // Для состояния загрузки
   const [errorMessage, setErrorMessage] = useState(''); // Для обработки ошибок
+  const [status, setStatus] = useState(''); // Для хранения статуса заявки
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRequestData = async () => {
       if (!reqId) {
-        setLoading(false); // Если reqId не установлен, выходим из функции
+        setLoading(false);
         return;
       }
 
+      setLoading(true); // Включаем анимацию загрузки
       try {
-        const response = await fetch(`/api/requests/${reqId}/`);
-        
-        if (!response.ok) {
-          throw new Error('Ошибка загрузки данных! Заявка не активна или необходимо авторизоваться!');
-        }
-
-        const requestData = await response.json();
-        setCurrentThreats(requestData.threats); // Устанавливаем угрозы из ответа
+        const response = await axios.get(`/api/requests/${reqId}/`);
+        setCurrentThreats(response.data.threats);
+        setStatus(response.data.status);
       } catch (err) {
-        // Если произошла ошибка, используем мок-данные только если нет соединения
+        console.error('Ошибка при загрузке:', err);
         const mockRequest = mockRequests.find(request => request.reqId === reqId);
-        
         if (mockRequest) {
           setCurrentThreats(mockRequest.threats);
+          setStatus(mockRequest.status);
         } else {
           setErrorMessage('Заявка не найдена');
         }
       } finally {
-        setLoading(false);
+        setLoading(false); // Отключаем анимацию загрузки
       }
     };
 
@@ -78,41 +83,56 @@ const RequestPage = () => {
   }, [reqId]);
 
   const handleDelete = async () => {
-    if (!reqId) return; // Если reqId не установлен, ничего не делаем
+    if (!reqId) return;
 
+    setLoading(true); // Включаем анимацию загрузки
     try {
-      const response = await fetch('/del_request', {
-        method: 'POST',
+      const csrfToken = Cookies.get('csrftoken');
+      await axios.delete(`/api/requests/moderate/${reqId}/`, {
         headers: {
-          'Content-Type': 'application/json',
-          // 'X-CSRFToken': getCsrfToken() // добавьте CSRF токен, если используете Django
+          'X-CSRFToken': csrfToken,
         },
-        body: JSON.stringify({ request_id: reqId })
       });
-      if (response.ok) {
-        alert('Запрос успешно удален');
-        setCurrentThreats([]); // Очищаем угрозы после удаления
-      } else {
-        alert('Ошибка при удалении запроса');
-      }
+      setCurrentThreats([]);
+      dispatch(setCurrentRequestId(null));
+      dispatch(setCurrentCount(0));
+      navigate('/threats');
     } catch (error) {
-      console.error('Ошибка:', error);
+      console.error('Ошибка при удалении:', error);
+    } finally {
+      setLoading(false); // Отключаем анимацию загрузки
     }
   };
 
-  const getCsrfToken = () => {
-    return document.cookie.split('; ')
-      .find(row => row.startsWith('csrftoken'))
-      ?.split('=')[1];
+  const handleConfirmRequest = async () => {
+    if (!reqId) return;
+
+    setLoading(true); // Включаем анимацию загрузки
+    try {
+      const csrfToken = Cookies.get('csrftoken');
+      await axios.put(`/api/requests/form/${reqId}/`, null, {
+        headers: {
+          'X-CSRFToken': csrfToken,
+        },
+      });
+      setCurrentThreats([]);
+      dispatch(setCurrentRequestId(null));
+      dispatch(setCurrentCount(0));
+      navigate('/threats');
+    } catch (error) {
+      console.error('Ошибка при подтверждении заявки:', error);
+    } finally {
+      setLoading(false); // Отключаем анимацию загрузки
+    }
   };
 
   // Обработка состояния загрузки и ошибок
   if (loading) {
     return (
-      <div>
+      <div className="loading-screen">
         <header className="site-header">
           <a href="/" className="site-name">Мониторинг угроз</a>
-          <Navbar /> {/* Добавляем Navbar */}
+          <Navbar />
         </header>
         <Breadcrumbs />
         <div>Загрузка данных заявки...</div>
@@ -120,13 +140,12 @@ const RequestPage = () => {
     );
   }
 
-  // Если ошибка произошла, выводим сообщение
   if (errorMessage) {
     return (
-      <div>
+      <div className="error-screen">
         <header className="site-header">
           <a href="/" className="site-name">Мониторинг угроз</a>
-          <Navbar /> {/* Добавляем Navbar */}
+          <Navbar />
         </header>
         <Breadcrumbs />
         <div>{errorMessage}</div>
@@ -134,22 +153,29 @@ const RequestPage = () => {
     );
   }
 
-  // Если reqId не установлен, ничего не выводим
   if (!reqId) {
     return null;
   }
 
   return (
-    <div>
-      <header className="site-header">
-        <a href="/" className="site-name">Мониторинг угроз</a>
-        <Navbar /> {/* Добавляем Navbar */}
+    <div className="request-page container-fluid bg-dark text-light min-vh-100">
+      <header className="d-flex justify-content-between align-items-center px-5 py-3 site-header" style={{ backgroundColor: '#333', height: '70%', maxHeight: '60px', width: '1990px', marginLeft: '-30px' }}>
+        <Link to="/" className="text-light fs-4 header-text">Мониторинг угроз</Link>
+        <Navbar />
       </header>
+
       <Breadcrumbs />
-      <div className="request-buttons">
-        <button onClick={handleDelete} className="del-button">
-          Удалить
-        </button>
+      <div className="request-buttons" style={{ gap: '2%' }}>
+        {status === 'draft' && (
+          <button onClick={handleConfirmRequest} className="btn btn-success">
+            Подтвердить заявку
+          </button>
+        )}
+        {status === 'draft' && (
+          <button onClick={handleDelete} className="btn btn-danger">
+            Удалить
+          </button>
+        )}
       </div>
 
       <main className="site-body">

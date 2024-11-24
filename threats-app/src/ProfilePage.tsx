@@ -63,7 +63,7 @@ const ProfilePage = () => {
 
   return (
     <div className="container-fluid bg-dark text-light min-vh-100">
-      <header className="d-flex justify-content-between align-items-center px-5 py-3 site-header" style={{ backgroundColor: '#333', maxHeight: '60px' }}>
+      <header className="d-flex justify-content-between align-items-center px-5 py-3 site-header" style={{ backgroundColor: '#333', height: '70%', maxHeight: '60px', width: '1990px', marginLeft: '-30px' }}>
         <Link to="/" className="text-light fs-4 header-text">Мониторинг угроз</Link>
         <Navbar />
       </header>

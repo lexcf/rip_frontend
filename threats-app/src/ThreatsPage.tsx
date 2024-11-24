@@ -1,174 +1,148 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { setThreats, setFilteredThreats, setInputValue, setPriceFrom, setPriceTo, setCurrentRequestId, setCurrentCount } from './redux/threatsSlice';
-import Breadcrumbs from './Breadcrumbs';
+import { useNavigate, Link } from 'react-router-dom';
+import { logout } from './redux/authSlice';
 import Navbar from './Navbar';
+import Breadcrumbs from './Breadcrumbs';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
-const defaultImageUrl = '/rip_frontend/static/network.jpg';
-
-const mockThreats = [
-  { pk: 1, threat_name: 'Угроза 1', short_description: 'Описание угрозы 1', img_url: defaultImageUrl, price: 10000 },
-  { pk: 2, threat_name: 'Угроза 2', short_description: 'Описание угрозы 2', img_url: defaultImageUrl, price: 20000 },
-  { pk: 3, threat_name: 'Угроза 3', short_description: 'Описание угрозы 3', img_url: defaultImageUrl, price: 14000 },
-];
-
-
-
-const ThreatsPage = () => {
-  const { inputValue, priceFrom, priceTo, threats, filteredThreats, currentRequestId, currentCount } = useSelector((state) => state.threats);
-  const { isAuthenticated, username } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
+const ProfilePage = () => {
+  const { username, isAuthenticated } = useSelector((state) => state.auth);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false); // Состояние загрузки
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (threats.length === 0) {
-      const fetchThreats = async () => {
-        try {
-          const response = await fetch('/api/threats/', { signal: AbortSignal.timeout(2000) });
-          const threatsData = await response.json();
-          const filteredData = threatsData.filter(item => item.pk !== undefined);
-          const requestData = threatsData.find(item => item.request);
-          dispatch(setThreats(filteredData));
-          dispatch(setCurrentRequestId(requestData?.request?.pk || null));
-          dispatch(setCurrentCount(requestData?.request?.threats_amount || 0));
-        } catch (error) {
-          console.error('Ошибка при загрузке данных угроз:', error);
-          dispatch(setThreats(mockThreats));
-        }
-      };
-      fetchThreats();
+    if (!isAuthenticated) {
+      navigate('/login');
     }
-  }, [dispatch, threats]);
+  }, [isAuthenticated, navigate]);
 
-  const handleSearchSubmit = async (e) => {
+  const handleProfileUpdate = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
     try {
-      const response = await fetch(`/api/threats/?name=${inputValue}&price_from=${priceFrom}&price_to=${priceTo}`, { signal: AbortSignal.timeout(2000) });
-      const result = await response.json();
-      const filteredResult = result.filter(item => item.pk !== undefined);
-      dispatch(setThreats(filteredResult));
-    } catch (error) {
-      console.error('Ошибка при выполнении поиска:', error);
+      const csrfToken = Cookies.get('csrftoken'); // Получаем CSRF токен из cookies
+      const data = {};
 
-      const filteredLocalThreats = mockThreats.filter(threat => {
-        const matchesName = inputValue
-          ? threat.threat_name.toLowerCase().includes(inputValue.toLowerCase())
-          : true;
-        const matchesPriceFrom = priceFrom ? threat.price >= priceFrom : true;
-        const matchesPriceTo = priceTo ? threat.price <= priceTo : true;
-        return matchesName && matchesPriceFrom && matchesPriceTo;
-      });
+      // Добавляем только те параметры, которые не пустые
+      if (email) data.email = email;
+      if (password) data.password = password;
 
-      console.log(filteredLocalThreats)
-      dispatch(setThreats(filteredLocalThreats));
+      // Проверяем, есть ли данные для отправки
+      if (Object.keys(data).length === 0) {
+        setError('Необходимо ввести хотя бы один параметр для обновления.');
+        setLoading(false);
+        return;
       }
-  };
 
-  const handleAddThreat = async (threatId) => {
-    try {
-      const response = await fetch('/add_threat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ threat_id: threatId }),
+      const response = await axios.put('/api/auth/profile/', data, {
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Content-Type': 'application/json',
+        },
       });
-      if (response.ok) alert('Угроза добавлена');
-      else alert('Ошибка при добавлении угрозы');
-    } catch (error) {
-      console.error('Ошибка при добавлении угрозы:', error);
+
+      if (response.status === 200) {
+        setSuccess('Профиль обновлен успешно. Пожалуйста, выполните вход заново.');
+        setError('');
+        dispatch(logout()); // Разлогиниваем пользователя
+      }
+    } catch (err) {
+      console.error('Ошибка при обновлении профиля:', err);
+
+      // Обработка ошибки
+      if (err.response?.status === 400) {
+        setError('Неверные данные. Проверьте введенные параметры.');
+      } else if (err.response?.status === 401) {
+        setError('Сессия истекла. Пожалуйста, войдите заново.');
+        dispatch(logout());
+      } else {
+        setError('Ошибка при обновлении данных профиля. Попробуйте позже.');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="container-fluid bg-dark text-light min-vh-100">
-      <header className="d-flex justify-content-between align-items-center px-5 py-3 site-header" style={{ backgroundColor: '#333', height: '70%', maxHeight: '60px', width: '1990px', marginLeft:'-30px' }}>
-        <Link to="/" className="text-light fs-4 header-text">Мониторинг угроз</Link>
-
+      <header
+        className="d-flex justify-content-between align-items-center px-5 py-3 site-header"
+        style={{
+          backgroundColor: '#333',
+          height: '70%',
+          maxHeight: '60px',
+          width: '1990px',
+          marginLeft: '-30px',
+        }}
+      >
+        <Link to="/" className="text-light fs-4 header-text">
+          Мониторинг угроз
+        </Link>
         <Navbar />
       </header>
 
       <Breadcrumbs />
 
       <div className="container my-4">
-        <form onSubmit={handleSearchSubmit} className="row g-3 align-items-center">
-          <div className="col">
+        <h2 className="mb-4 text-center">Изменить профиль</h2>
+
+        {/* Вывод сообщений об ошибках и успехе */}
+        {error && <div className="alert alert-danger">{error}</div>}
+        {success && <div className="alert alert-success">{success}</div>}
+
+        <form onSubmit={handleProfileUpdate} className="row g-3">
+          <div className="col-12">
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
             <input
-              type="text"
+              type="email"
               className="form-control"
-              placeholder="Имя угрозы"
-              value={inputValue}
-              onChange={(e) => dispatch(setInputValue(e.target.value))}
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Введите новый email (если хотите изменить)"
             />
           </div>
-          <div className="col">
+
+          <div className="col-12">
+            <label htmlFor="password" className="form-label">
+              Пароль
+            </label>
             <input
-              type="number"
+              type="password"
               className="form-control"
-              placeholder="Цена от"
-              value={priceFrom}
-              onChange={(e) => dispatch(setPriceFrom(e.target.value))}
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Введите новый пароль (если хотите изменить)"
             />
           </div>
-          <div className="col">
-            <input
-              type="number"
-              className="form-control"
-              placeholder="Цена до"
-              value={priceTo}
-              onChange={(e) => dispatch(setPriceTo(e.target.value))}
-            />
-          </div>
-          <div className="col-auto">
-            <button type="submit" className="btn btn-success">Поиск</button>
-          </div>
-          <div className="col-auto">
-            <a
-              href={`/requests/${currentRequestId}`}
-              className="btn btn-outline-success"
-              style={{ marginLeft: '10px' }}
-            >
-              Текущая заявка ({currentCount})
-            </a>
+
+          <div className="col-12 text-center">
+            <button type="submit" className="btn btn-success" disabled={loading}>
+              {loading ? (
+                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              ) : (
+                'Обновить профиль'
+              )}
+            </button>
           </div>
         </form>
-      </div>
-
-      <div className="container">
-        <div className="row row-cols-1 row-cols-md-3 g-4">
-          {filteredThreats.map((threat) => (
-            <div key={threat.pk} className="col">
-              <Link to={`/description/${threat.pk}`} className="text-decoration-none">
-                <div className="card h-100 bg-dark text-light border-light">
-                  <img
-                    src={threat.img_url || defaultImageUrl}
-                    className="card-img-top"
-                    alt={threat.threat_name}
-                    style={{ marginLeft: '-4%' }}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title">{threat.threat_name}</h5>
-                    <p className="card-text">{threat.short_description}</p>
-                  </div>
-                  <div className="card-footer text-center">
-                    <button
-                      className="btn btn-outline-success"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleAddThreat(threat.pk);
-                      }}
-                    >
-                      Добавить
-                    </button>
-                  </div>
-                </div>
-              </Link>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );
 };
 
-export default ThreatsPage;
+export default ProfilePage;
