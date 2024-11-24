@@ -10,6 +10,8 @@ import Cookie from 'js-cookie';
 const LoginPage = () => {
   const [username, setUsername] = useState(''); // Состояние для имени пользователя
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -30,7 +32,7 @@ const LoginPage = () => {
         navigate('/threats'); // После успешного входа перенаправляем на страницу угроз
       } else {
         const errorData = await response.json();
-        alert(`Ошибка входа: ${errorData.message || 'Неверное имя пользователя или пароль'}`);
+        setError('Неверное имя пользователя или пароль')
       }
     } catch (error) {
       console.error('Ошибка при входе:', error);
@@ -51,6 +53,10 @@ const LoginPage = () => {
       <div className="container-fluid d-flex justify-content-center align-items-center flex-grow-1">
         <div className="card bg-dark text-light border-light p-4" style={{ maxWidth: '400px', width: '100%' }}>
           <h2 className="text-center mb-4">Вход</h2>
+
+          {error && <div className="alert alert-danger">{error}</div>}
+          {success && <div className="alert alert-success">{success}</div>}
+
           <form onSubmit={handleLogin}>
             <div className="mb-3">
               <label htmlFor="username" className="form-label">Имя пользователя</label>

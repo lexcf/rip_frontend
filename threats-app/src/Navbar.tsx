@@ -39,7 +39,7 @@ const Navbar = () => {
 
       {isAuthenticated ? (
         <>
-          <span style={{ marginRight:'1em' }}>Привет, {username}</span>
+          <Link to="/profile" className="navbar-link">{username}</Link>
         </>
       ) : (
           <span></span>
@@ -50,7 +50,8 @@ const Navbar = () => {
 
       {isAuthenticated ? (
         <>
-          <Link to="/threats" className="navbar-link" onClick={handleLogout}>Выход</Link>
+          <Link to="/requests" className="navbar-link">Заявки</Link>
+          <Link to="/threats" onClick={handleLogout} className="navbar-link">Выход</Link>
         </>
       ) : (
         <Link to="/login" className="navbar-link">Вход</Link>

@@ -5,7 +5,10 @@ import HomePage from './HomePage';
 import ThreatsPage from './ThreatsPage';
 import RequestPage from './RequestPage';
 import RegisterPage from './RegisterPage';
+import RequestsPage from './RequestsTablePage';
 import LoginPage from './LoginPage';
+import ProfilePage from './ProfilePage'
+
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './redux/store';
@@ -34,8 +37,16 @@ function App() {
       element: <HomePage />
     },
     {
+      path: '/profile',
+      element: <ProfilePage />
+    },
+    {
       path: '/threats',
       element: <ThreatsPage />
+    },
+    {
+      path: '/requests/',
+      element: <RequestsPage />
     },
     {
       path: '/requests/:reqId',

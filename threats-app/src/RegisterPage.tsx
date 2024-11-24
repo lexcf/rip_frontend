@@ -9,6 +9,8 @@ const RegistrationPage = () => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
