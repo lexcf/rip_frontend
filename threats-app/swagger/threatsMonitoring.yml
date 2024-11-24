@@ -1,0 +1,410 @@
+openapi: 3.0.1
+info:
+  title: Threat Management API
+  description: API for managing threats, requests, and user profiles.
+  version: 1.0.0
+paths:
+  /threats/:
+    get:
+      security:
+        - cookieAuth: []
+      summary: Get a list of threats
+      description: Get a list of all threats, optionally filtered by price range or name.
+      parameters:
+        - name: price_from
+          in: query
+          description: Minimum price of threat
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: price_to
+          in: query
+          description: Maximum price of threat
+          required: false
+          schema:
+            type: number
+            format: float
+        - name: name
+          in: query
+          description: Name of the threat
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of threats
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ThreatListSerializer'
+  /threats/detail/:
+    post:
+      summary: Add a new threat (moderators only)
+      description: Adds a new threat to the system. Accessible only to moderators.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreatDetailSerializer'
+      responses:
+        '201':
+          description: Threat successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreatDetailSerializer'
+        '400':
+          description: Invalid data provided
+        '403':
+          description: Forbidden (only accessible by moderators)
+  /threats/detail/{pk}/:
+    get:
+      summary: Get details of a specific threat
+      description: Retrieve detailed information about a specific threat by its ID.
+      parameters:
+        - name: pk
+          in: path
+          description: ID of the threat to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Threat details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreatDetailSerializer'
+    put:
+      summary: Update a specific threat (moderators only)
+      description: Update details of an existing threat. Accessible only to moderators.
+      parameters:
+        - name: pk
+          in: path
+          description: ID of the threat to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreatDetailSerializer'
+      responses:
+        '200':
+          description: Threat successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreatDetailSerializer'
+        '400':
+          description: Invalid data provided
+        '403':
+          description: Forbidden (only accessible by moderators)
+    delete:
+      summary: Delete a specific threat (moderators only)
+      description: Mark a threat as deleted. Accessible only to moderators.
+      parameters:
+        - name: pk
+          in: path
+          description: ID of the threat to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Threat deleted successfully
+        '403':
+          description: Forbidden (only accessible by moderators)
+  /threats/add/{pk}/:
+    post:
+      summary: Add a threat to a user's draft request
+      description: Adds a specific threat to a user's draft request. If no draft request exists, a new request is created.
+      parameters:
+        - name: pk
+          in: path
+          description: ID of the threat to add
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                price:
+                  type: number
+                  format: float
+                  description: Price of the threat
+                  example: 100.00
+      responses:
+        '200':
+          description: Threat successfully added to the draft request
+        '404':
+          description: Threat not found
+  /threats/image/:
+    post:
+      summary: Upload an image for a specific threat (moderators only)
+      description: Upload an image for a specific threat. Accessible only to moderators.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                pic:
+                  type: string
+                  format: binary
+                threat_id:
+                  type: integer
+                  description: ID of the threat to upload the image for
+      responses:
+        '201':
+          description: Image uploaded successfully
+        '400':
+          description: Bad request
+        '403':
+          description: Forbidden (only accessible by moderators)
+  /requests/:
+    get:
+      summary: Get a list of requests
+      description: Get a list of all requests, optionally filtered by date and status.
+      parameters:
+        - name: date
+          in: query
+          description: Filter requests by date
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: status
+          in: query
+          description: Filter requests by status
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of requests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RequestSerializer'
+  /requests/{pk}/:
+    get:
+      summary: Get details of a specific request
+      description: Retrieve detailed information about a specific request, including associated threats.
+      parameters:
+        - name: pk
+          in: path
+          description: ID of the request to retrieve
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Request details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestSerializer'
+    put:
+      summary: Update a specific request
+      description: Update details of an existing request.
+      parameters:
+        - name: pk
+          in: path
+          description: ID of the request to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PutRequestSerializer'
+      responses:
+        '200':
+          description: Request successfully updated
+        '400':
+          description: Invalid data provided
+  /requests/form/{pk}/:
+    put:
+      summary: Mark a request as formed
+      description: Mark a draft request as formed. Only available for requests with a 'draft' status.
+      parameters:
+        - name: pk
+          in: path
+          description: ID of the request to form
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Request successfully formed
+        '400':
+          description: Invalid request status
+        '403':
+          description: Forbidden
+  /requests/moderate/{pk}/:
+    put:
+      summary: Approve or decline a request (moderators only)
+      description: Approve or decline a request. Only available for moderators.
+      parameters:
+        - name: pk
+          in: path
+          description: ID of the request to moderate
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AcceptRequestSerializer'
+      responses:
+        '200':
+          description: Request successfully moderated
+        '400':
+          description: Invalid data provided
+        '403':
+          description: Forbidden (only accessible by moderators)
+    delete:
+      summary: Delete a request (moderators only)
+      description: Delete a request. Only available for moderators.
+      parameters:
+        - name: pk
+          in: path
+          description: ID of the request to delete
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Request successfully deleted
+  /request-threat/{pk}/:
+    delete:
+      summary: Remove a threat from a request
+      description: Remove a specific threat from a request.
+      parameters:
+        - name: pk
+          in: path
+          description: ID of the request to remove the threat from
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                threat_id:
+                  type: integer
+                  description: ID of the threat to remove
+      responses:
+        '200':
+          description: Threat successfully removed from request
+        '400':
+          description: Invalid data provided
+    put:
+      summary: Update the price of a threat in a request
+      description: Update the price of a specific threat in a request.
+      parameters:
+        - name: pk
+          in: path
+          description: ID of the request to update the threat in
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                price:
+                  type: number
+                  format: float
+                  description: New price of the threat
+                  example: 150.00
+      responses:
+        '200':
+          description: Threat price successfully updated
+        '400':
+          description: Invalid price data provided
+
+          
+
+components:
+  securitySchemes:
+    cookieAuth:   # Описание схемы безопасности через куки
+      type: apiKey
+      in: cookie
+      name: sessionid
+  schemas:
+    ThreatListSerializer:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+    ThreatDetailSerializer:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        image:
+          type: string
+    RequestSerializer:
+      type: object
+      properties:
+        id:
+          type: integer
+        user:
+          type: string
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+    PutRequestSerializer:
+      type: object
+      properties:
+        status:
+          type: string
+    AcceptRequestSerializer:
+      type: object
+      properties:
+        accepted:
+          type: boolean
+
+security:
+  - cookieAuth: []

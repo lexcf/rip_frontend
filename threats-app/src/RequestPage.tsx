@@ -165,7 +165,7 @@ const RequestPage = () => {
   // Обработка состояния загрузки и ошибок
   if (loading) {
     return (
-      <div className="loading-screen">
+      <div className="loading-screen request-page container-fluid bg-dark text-light min-vh-100">
         <header className="site-header">
           <a href="/" className="site-name">Мониторинг угроз</a>
           <Navbar />
@@ -179,7 +179,7 @@ const RequestPage = () => {
   // Если ошибка произошла, выводим сообщение
   if (errorMessage) {
     return (
-      <div className="error-screen">
+      <div className="error-screen request-page container-fluid bg-dark text-light min-vh-100">
         <header className="site-header">
           <a href="/" className="site-name">Мониторинг угроз</a>
           <Navbar />
@@ -241,7 +241,9 @@ const RequestPage = () => {
                     </tbody>
                   </table>
                 </div>
+                {status === 'draft' && (
                 <button className='btn btn-danger' style={{width: '10%',position:'relative',top:'27%',left:'60%'}} onClick={() => handleDeleteThreat(threat.pk)}>Удалить</button>
+                )}
                 <img src={threat.img_url ? threat.img_url : defaultImageUrl}  alt={threat.threat_name} className="card__image card__image-request" />
               </div>
             ))

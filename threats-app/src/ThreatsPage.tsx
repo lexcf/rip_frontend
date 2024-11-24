@@ -12,6 +12,7 @@ import {
   setCurrentRequestId,
   setCurrentCount,
 } from './redux/threatsSlice';
+import { api } from './api';
 import Breadcrumbs from './Breadcrumbs';
 import Navbar from './Navbar';
 import Cookies from 'js-cookie';
@@ -38,12 +39,20 @@ const ThreatsPage = () => {
       setLoading(true);
       setError('');
       try {
+
+        //const test = await api.threats.threatsList()
+        //console.log('test:')
+        //console.log(test);
+
         const response = await axios.get('/api/threats/', { timeout: 2000 });
+        //const response = await api.threats.threatsList()
         const threatsData = response.data.filter((item) => item.pk !== undefined);
         dispatch(setThreats(threatsData));
 
         // Проверяем, существует ли заявка
         const requestData = response.data.find((item) => item.request);
+        console.log('qs');
+        console.log(requestData)
         if (requestData?.request?.pk) {
           dispatch(setCurrentRequestId(requestData.request.pk));
           dispatch(setCurrentCount(requestData.request.threats_amount));
