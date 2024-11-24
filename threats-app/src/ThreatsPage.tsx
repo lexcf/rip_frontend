@@ -1,76 +1,128 @@
-import React, { useState, useEffect } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
-import { logout } from './redux/authSlice';
-import Navbar from './Navbar';
-import Breadcrumbs from './Breadcrumbs';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate, Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  setThreats,
+  setFilteredThreats,
+  setInputValue,
+  setPriceFrom,
+  setPriceTo,
+  setCurrentRequestId,
+  setCurrentCount,
+} from './redux/threatsSlice';
+import Breadcrumbs from './Breadcrumbs';
+import Navbar from './Navbar';
 import Cookies from 'js-cookie';
 
-const ProfilePage = () => {
-  const { username, isAuthenticated } = useSelector((state) => state.auth);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false); // Состояние загрузки
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const navigate = useNavigate();
+const defaultImageUrl = '/rip_frontend/static/network.jpg';
+
+const ThreatsPage = () => {
+  const [loading, setLoading] = useState(false); // Состояние для анимации загрузки
+  const [error, setError] = useState(''); // Состояние для обработки ошибок
+  const {
+    inputValue,
+    priceFrom,
+    priceTo,
+    threats,
+    filteredThreats,
+    currentRequestId,
+    currentCount,
+  } = useSelector((state) => state.threats);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-    }
-  }, [isAuthenticated, navigate]);
+    const fetchThreats = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const response = await axios.get('/api/threats/', { timeout: 2000 });
+        const threatsData = response.data.filter((item) => item.pk !== undefined);
+        dispatch(setThreats(threatsData));
 
-  const handleProfileUpdate = async (e) => {
+        // Проверяем, существует ли заявка
+        const requestData = response.data.find((item) => item.request);
+        if (requestData?.request?.pk) {
+          dispatch(setCurrentRequestId(requestData.request.pk));
+          dispatch(setCurrentCount(requestData.request.threats_amount));
+        }
+      } catch (error) {
+        console.error('Ошибка при загрузке данных угроз:', error);
+        setError('Ошибка при загрузке данных угроз');
+        dispatch(setThreats([]));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchThreats();
+  }, [dispatch]);
+
+  const handleSearchSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setSuccess('');
-
     try {
-      const csrfToken = Cookies.get('csrftoken'); // Получаем CSRF токен из cookies
-      const data = {};
-
-      // Добавляем только те параметры, которые не пустые
-      if (email) data.email = email;
-      if (password) data.password = password;
-
-      // Проверяем, есть ли данные для отправки
-      if (Object.keys(data).length === 0) {
-        setError('Необходимо ввести хотя бы один параметр для обновления.');
-        setLoading(false);
-        return;
-      }
-
-      const response = await axios.put('/api/auth/profile/', data, {
-        headers: {
-          'X-CSRFToken': csrfToken,
-          'Content-Type': 'application/json',
+      const response = await axios.get('/api/threats/', {
+        params: {
+          name: inputValue,
+          price_from: priceFrom,
+          price_to: priceTo,
         },
+        timeout: 2000,
+      });
+      const filteredResult = response.data.filter((item) => item.pk !== undefined);
+      dispatch(setThreats(filteredResult));
+    } catch (error) {
+      console.error('Ошибка при выполнении поиска:', error);
+      setError('Ошибка при выполнении поиска. Используется локальный поиск.');
+
+      const filteredLocalThreats = threats.filter((threat) => {
+        const matchesName = inputValue
+          ? threat.threat_name.toLowerCase().includes(inputValue.toLowerCase())
+          : true;
+        const matchesPriceFrom = priceFrom ? threat.price >= priceFrom : true;
+        const matchesPriceTo = priceTo ? threat.price <= priceTo : true;
+        return matchesName && matchesPriceFrom && matchesPriceTo;
       });
 
-      if (response.status === 200) {
-        setSuccess('Профиль обновлен успешно. Пожалуйста, выполните вход заново.');
-        setError('');
-        dispatch(logout()); // Разлогиниваем пользователя
-      }
-    } catch (err) {
-      console.error('Ошибка при обновлении профиля:', err);
-
-      // Обработка ошибки
-      if (err.response?.status === 400) {
-        setError('Неверные данные. Проверьте введенные параметры.');
-      } else if (err.response?.status === 401) {
-        setError('Сессия истекла. Пожалуйста, войдите заново.');
-        dispatch(logout());
-      } else {
-        setError('Ошибка при обновлении данных профиля. Попробуйте позже.');
-      }
+      dispatch(setThreats(filteredLocalThreats)); // Локальный поиск
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddThreat = async (threatId) => {
+    setError('');
+    try {
+      const csrfToken = Cookies.get('csrftoken');
+      await axios.post(
+        `/api/threats/add/${threatId}/`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+          },
+        }
+      );
+
+      // После добавления угрозы обновляем список
+      const response = await axios.get('/api/threats/', { timeout: 2000 });
+      const threatsData = response.data.filter((item) => item.pk !== undefined);
+      dispatch(setThreats(threatsData));
+
+      // Проверяем наличие заявки
+      const requestData = response.data.find((item) => item.request);
+      if (requestData?.request?.pk) {
+        dispatch(setCurrentRequestId(requestData.request.pk));
+        dispatch(setCurrentCount(requestData.request.threats_amount));
+      }
+    } catch (error) {
+      console.error('Ошибка при добавлении угрозы:', error);
+      setError('Ошибка при добавлении угрозы');
     }
   };
 
@@ -95,54 +147,98 @@ const ProfilePage = () => {
       <Breadcrumbs />
 
       <div className="container my-4">
-        <h2 className="mb-4 text-center">Изменить профиль</h2>
-
-        {/* Вывод сообщений об ошибках и успехе */}
-        {error && <div className="alert alert-danger">{error}</div>}
-        {success && <div className="alert alert-success">{success}</div>}
-
-        <form onSubmit={handleProfileUpdate} className="row g-3">
-          <div className="col-12">
-            <label htmlFor="email" className="form-label">
-              Email
-            </label>
+        <form onSubmit={handleSearchSubmit} className="row g-3 align-items-center">
+          <div className="col">
             <input
-              type="email"
+              type="text"
               className="form-control"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Введите новый email (если хотите изменить)"
+              placeholder="Имя угрозы"
+              value={inputValue}
+              onChange={(e) => dispatch(setInputValue(e.target.value))}
             />
           </div>
-
-          <div className="col-12">
-            <label htmlFor="password" className="form-label">
-              Пароль
-            </label>
+          <div className="col">
             <input
-              type="password"
+              type="number"
               className="form-control"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Введите новый пароль (если хотите изменить)"
+              placeholder="Цена от"
+              value={priceFrom}
+              onChange={(e) => dispatch(setPriceFrom(e.target.value))}
             />
           </div>
-
-          <div className="col-12 text-center">
-            <button type="submit" className="btn btn-success" disabled={loading}>
-              {loading ? (
-                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              ) : (
-                'Обновить профиль'
-              )}
+          <div className="col">
+            <input
+              type="number"
+              className="form-control"
+              placeholder="Цена до"
+              value={priceTo}
+              onChange={(e) => dispatch(setPriceTo(e.target.value))}
+            />
+          </div>
+          <div className="col-auto">
+            <button type="submit" className="btn btn-success">
+              Поиск
+            </button>
+          </div>
+          <div className="col-auto">
+            <button
+              type="button"
+              className={`btn ${currentRequestId ? 'btn-outline-success' : 'btn-outline-secondary'}`}
+              style={{ marginLeft: '10px' }}
+              disabled={currentRequestId == null}
+              onClick={() => currentRequestId && navigate(`/requests/${currentRequestId}`)}
+            >
+              Текущая заявка ({currentCount})
             </button>
           </div>
         </form>
+      </div>
+
+      <div className="container">
+        {loading ? (
+          <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
+            <div className="spinner-border text-light" role="status">
+              <span className="visually-hidden">Загрузка...</span>
+            </div>
+          </div>
+        ) : error ? (
+          <div className="alert alert-danger">{error}</div>
+        ) : (
+          <div className="row row-cols-1 row-cols-md-3 g-4">
+            {filteredThreats.map((threat) => (
+              <div key={threat.pk} className="col">
+                <Link to={`/description/${threat.pk}`} className="text-decoration-none">
+                  <div className="card h-100 bg-dark text-light border-light">
+                    <img
+                      src={threat.img_url || defaultImageUrl}
+                      className="card-img-top"
+                      alt={threat.threat_name}
+                      style={{ marginLeft: '-4%' }}
+                    />
+                    <div className="card-body">
+                      <h5 className="card-title">{threat.threat_name}</h5>
+                      <p className="card-text">{threat.short_description}</p>
+                    </div>
+                    <div className="card-footer text-center">
+                      <button
+                        className="btn btn-outline-success"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleAddThreat(threat.pk);
+                        }}
+                      >
+                        Добавить
+                      </button>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default ProfilePage;
+export default ThreatsPage;

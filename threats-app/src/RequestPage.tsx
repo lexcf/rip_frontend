@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import './App.css';
 import Navbar from './Navbar';
 import Breadcrumbs from './Breadcrumbs';
+import { Link } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import Cookies from 'js-cookie';
 import { useSelector, useDispatch } from 'react-redux';
-import { setCurrentRequestId, setCurrentCount } from './redux/threatsSlice';
+import { setThreats, setFilteredThreats, setInputValue, setPriceFrom, setPriceTo, setCurrentRequestId, setCurrentCount } from './redux/threatsSlice';
 
 // Мок-данные для заявок
 const mockRequests = [
@@ -45,84 +46,119 @@ const mockRequests = [
 const defaultImageUrl = '/static/network.jpg';
 
 const RequestPage = () => {
+  const { inputValue, priceFrom, priceTo, threats, filteredThreats, currentRequestId, currentCount } = useSelector((state) => state.threats);
   const { reqId } = useParams();
   const [currentThreats, setCurrentThreats] = useState([]);
   const [loading, setLoading] = useState(true); // Для состояния загрузки
   const [errorMessage, setErrorMessage] = useState(''); // Для обработки ошибок
   const [status, setStatus] = useState(''); // Для хранения статуса заявки
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+
+  const fetchRequestData = async () => {
+    if (!reqId) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/requests/${reqId}/`);
+
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки данных! Заявка не активна или необходимо авторизоваться!');
+      }
+
+      const requestData = await response.json();
+      setCurrentThreats(requestData.threats);
+      setStatus(requestData.status);
+    } catch (err) {
+      setErrorMessage('Ошибка при загрузке данных.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchRequestData = async () => {
-      if (!reqId) {
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true); // Включаем анимацию загрузки
-      try {
-        const response = await axios.get(`/api/requests/${reqId}/`);
-        setCurrentThreats(response.data.threats);
-        setStatus(response.data.status);
-      } catch (err) {
-        console.error('Ошибка при загрузке:', err);
-        const mockRequest = mockRequests.find(request => request.reqId === reqId);
-        if (mockRequest) {
-          setCurrentThreats(mockRequest.threats);
-          setStatus(mockRequest.status);
-        } else {
-          setErrorMessage('Заявка не найдена');
-        }
-      } finally {
-        setLoading(false); // Отключаем анимацию загрузки
-      }
-    };
-
     fetchRequestData();
   }, [reqId]);
 
   const handleDelete = async () => {
-    if (!reqId) return;
+    if (!reqId) return; // Если reqId не установлен, ничего не делаем
 
-    setLoading(true); // Включаем анимацию загрузки
     try {
-      const csrfToken = Cookies.get('csrftoken');
-      await axios.delete(`/api/requests/moderate/${reqId}/`, {
+      let csrfToken = Cookies.get('csrftoken');
+      const response = await fetch(`/api/requests/moderate/${reqId}/`, {
+        method: 'DELETE',
         headers: {
+          'Content-Type': 'application/json',
           'X-CSRFToken': csrfToken,
-        },
+        }
       });
-      setCurrentThreats([]);
-      dispatch(setCurrentRequestId(null));
-      dispatch(setCurrentCount(0));
-      navigate('/threats');
+      if (response.ok) {
+        setCurrentThreats([]); // Очищаем угрозы после удаления
+        dispatch(setCurrentRequestId(null));
+        dispatch(setCurrentCount(0));
+        navigate('/threats')
+      } else {
+        alert('Ошибка при удалении запроса');
+      }
     } catch (error) {
-      console.error('Ошибка при удалении:', error);
-    } finally {
-      setLoading(false); // Отключаем анимацию загрузки
+      console.error('Ошибка:', error);
     }
   };
+
+  const handleDeleteThreat = async (threat_id) => {
+    if (!reqId || !threat_id) return;
+  
+    try {
+      let csrfToken = Cookies.get('csrftoken');
+      const response = await fetch(`/api/request-threat/${reqId}/`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({ threat_id }), // Указываем id угрозы в теле запроса
+      });
+  
+      if (response.ok) {
+        // Успешно удалено
+        setCurrentThreats(currentThreats.filter((threat) => threat.id !== threat_id)); // Обновляем список угроз
+        await fetchRequestData();
+      } else {
+        alert('Ошибка при удалении угрозы');
+      }
+    } catch (error) {
+      console.error('Ошибка:', error);
+    }
+  };
+  
+
 
   const handleConfirmRequest = async () => {
     if (!reqId) return;
 
-    setLoading(true); // Включаем анимацию загрузки
     try {
-      const csrfToken = Cookies.get('csrftoken');
-      await axios.put(`/api/requests/form/${reqId}/`, null, {
+      let csrfToken = Cookies.get('csrftoken');
+      const response = await fetch(`/api/requests/form/${reqId}/`, {
+        method: 'PUT',
         headers: {
+          'Content-Type': 'application/json',
           'X-CSRFToken': csrfToken,
-        },
+        }
       });
-      setCurrentThreats([]);
-      dispatch(setCurrentRequestId(null));
-      dispatch(setCurrentCount(0));
-      navigate('/threats');
+      if (response.ok) {
+        setCurrentThreats([]); // Очищаем угрозы после удаления
+        dispatch(setCurrentRequestId(null));
+        dispatch(setCurrentCount(0));
+        navigate(`/threats`)
+      } else {
+        alert('Ошибка при удалении запроса');
+      }
     } catch (error) {
-      console.error('Ошибка при подтверждении заявки:', error);
-    } finally {
-      setLoading(false); // Отключаем анимацию загрузки
+      console.error('Ошибка:', error);
     }
   };
 
@@ -140,6 +176,7 @@ const RequestPage = () => {
     );
   }
 
+  // Если ошибка произошла, выводим сообщение
   if (errorMessage) {
     return (
       <div className="error-screen">
@@ -153,6 +190,7 @@ const RequestPage = () => {
     );
   }
 
+  // Если reqId не установлен, ничего не выводим
   if (!reqId) {
     return null;
   }
@@ -165,7 +203,7 @@ const RequestPage = () => {
       </header>
 
       <Breadcrumbs />
-      <div className="request-buttons" style={{ gap: '2%' }}>
+      <div className="request-buttons" style={{gap: '2%'}}>
         {status === 'draft' && (
           <button onClick={handleConfirmRequest} className="btn btn-success">
             Подтвердить заявку
@@ -178,7 +216,7 @@ const RequestPage = () => {
         )}
       </div>
 
-      <main className="site-body">
+      <main className="site-body ">
         <div className="cards-list-request">
           {currentThreats.length > 0 ? (
             currentThreats.map((threat, index) => (
@@ -196,14 +234,15 @@ const RequestPage = () => {
                     <tbody>
                       <tr>
                         <td>{threat.threat_name}</td>
-                        <td>{threat.company_name || 'Не указана'}</td>
+                        <td>{threat.company_name|| 'Не указана'}</td>
                         <td>{threat.price} ₽</td>
                         <td>{threat.short_description || 'Нет комментариев'}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
-                <img src={threat.img_url ? threat.img_url : defaultImageUrl} alt={threat.threat_name} className="card__image card__image-request" />
+                <button className='btn btn-danger' style={{width: '10%',position:'relative',top:'27%',left:'60%'}} onClick={() => handleDeleteThreat(threat.pk)}>Удалить</button>
+                <img src={threat.img_url ? threat.img_url : defaultImageUrl}  alt={threat.threat_name} className="card__image card__image-request" />
               </div>
             ))
           ) : (
