@@ -44,7 +44,7 @@ const ThreatDescription = () => {
   useEffect(() => {
     const fetchThreat = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/threats/detail/${threatId}/`,{ signal: AbortSignal.timeout(2000) });
+        const response = await fetch(`/api/threats/detail/${threatId}/`,{ signal: AbortSignal.timeout(2000) });
         
         if (!response.ok) {
           throw new Error('Ошибка при загрузке данных');

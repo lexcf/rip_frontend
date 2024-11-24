@@ -1,10 +1,11 @@
-// src/redux/store.js
 import { configureStore } from '@reduxjs/toolkit';
 import threatsReducer from './threatsSlice';
+import authReducer from './authSlice';
 
 const store = configureStore({
   reducer: {
     threats: threatsReducer,
+    auth: authReducer,
   },
 });
 

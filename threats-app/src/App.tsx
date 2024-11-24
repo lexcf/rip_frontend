@@ -4,6 +4,8 @@ import ThreatDescription from './DescriptionPage';
 import HomePage from './HomePage';
 import ThreatsPage from './ThreatsPage';
 import RequestPage from './RequestPage';
+import RegisterPage from './RegisterPage';
+import LoginPage from './LoginPage';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './redux/store';
@@ -11,7 +13,6 @@ import store from './redux/store';
 function App() {
 
   useEffect(() => {
-    // Check if we're in a Tauri environment
     if (window.__TAURI__) {
       const { invoke } = window.__TAURI__.tauri;
 
@@ -43,6 +44,14 @@ function App() {
     {
       path: '/description/:threatId',
       element: <ThreatDescription />
+    },
+    {
+      path: '/register',
+      element: <RegisterPage />
+    },
+    {
+      path: '/login',
+      element: <LoginPage />
     }
   ], { basename: '/rip_frontend' });
   

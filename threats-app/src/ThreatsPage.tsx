@@ -14,8 +14,11 @@ const mockThreats = [
   { pk: 3, threat_name: 'Угроза 3', short_description: 'Описание угрозы 3', img_url: defaultImageUrl, price: 14000 },
 ];
 
+
+
 const ThreatsPage = () => {
   const { inputValue, priceFrom, priceTo, threats, filteredThreats, currentRequestId, currentCount } = useSelector((state) => state.threats);
+  const { isAuthenticated, username } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -23,7 +26,7 @@ const ThreatsPage = () => {
     if (threats.length === 0) {
       const fetchThreats = async () => {
         try {
-          const response = await fetch('http://localhost:8000/threats/', { signal: AbortSignal.timeout(2000) });
+          const response = await fetch('/api/threats/', { signal: AbortSignal.timeout(2000) });
           const threatsData = await response.json();
           const filteredData = threatsData.filter(item => item.pk !== undefined);
           const requestData = threatsData.find(item => item.request);
@@ -42,7 +45,7 @@ const ThreatsPage = () => {
   const handleSearchSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:8000/threats/?name=${inputValue}&price_from=${priceFrom}&price_to=${priceTo}`, { signal: AbortSignal.timeout(2000) });
+      const response = await fetch(`/api/threats/?name=${inputValue}&price_from=${priceFrom}&price_to=${priceTo}`, { signal: AbortSignal.timeout(2000) });
       const result = await response.json();
       const filteredResult = result.filter(item => item.pk !== undefined);
       dispatch(setThreats(filteredResult));
@@ -81,6 +84,7 @@ const ThreatsPage = () => {
     <div className="container-fluid bg-dark text-light min-vh-100">
       <header className="d-flex justify-content-between align-items-center px-5 py-3 site-header" style={{ backgroundColor: '#333', height: '70%', maxHeight: '60px', width: '1990px', marginLeft:'-30px' }}>
         <Link to="/" className="text-light fs-4 header-text">Мониторинг угроз</Link>
+
         <Navbar />
       </header>
 

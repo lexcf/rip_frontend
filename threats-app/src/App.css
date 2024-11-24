@@ -500,24 +500,19 @@ a {
     flex-direction: row;
     margin-right: 80%;
   }
-
   .navbar-link {
     color: white;
     text-decoration: none;
     padding: 10px 15px;
     transition: background-color 0.3s;
   }
-  
   .navbar-link:hover {
     background-color: #00A88E;
   }
-
-
   .card {
     height: auto;
     width: 100%;
   }
-
   .breadcrumbs {
     margin: 10px 20px;
   }
@@ -548,7 +543,6 @@ a {
   .container .row {
     margin: 20px 0;
   }
-
 }
 /*
 @media (max-width: 768px) {
@@ -617,3 +611,4 @@ a {
     margin-left: 12%;
   }
 }*/
+
