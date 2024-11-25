@@ -119,13 +119,7 @@ const ThreatsPage = () => {
             <button type="submit" className="btn btn-success">Поиск</button>
           </div>
           <div className="col-auto">
-            <a
-              href={`/requests/${currentRequestId}`}
-              className="btn btn-outline-success"
-              style={{ marginLeft: '10px' }}
-            >
-              Текущая заявка ({currentCount})
-            </a>
+
           </div>
         </form>
       </div>
@@ -147,15 +141,6 @@ const ThreatsPage = () => {
                     <p className="card-text">{threat.short_description}</p>
                   </div>
                   <div className="card-footer text-center">
-                    <button
-                      className="btn btn-outline-success"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleAddThreat(threat.pk);
-                      }}
-                    >
-                      Добавить
-                    </button>
                   </div>
                 </div>
               </Link>
