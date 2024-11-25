@@ -54,6 +54,9 @@ const RequestPage = () => {
   const [errorMessage, setErrorMessage] = useState(''); // Для обработки ошибок
   const [status, setStatus] = useState(''); // Для хранения статуса заявки
 
+  const [editingPrice, setEditingPrice] = useState(null); // ID угрозы для редактирования
+  const [newPrice, setNewPrice] = useState(''); // Новая цена
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -84,6 +87,46 @@ const RequestPage = () => {
   useEffect(() => {
     fetchRequestData();
   }, [reqId]);
+
+  const handleEditPrice = (threatId, currentPrice) => {
+    setEditingPrice(threatId); // Устанавливаем ID редактируемой угрозы
+    setNewPrice(currentPrice); // Устанавливаем текущую цену
+  };
+
+  const handleSavePrice = async (threatId) => {
+    if (!reqId || !threatId || newPrice === '') return; // Проверяем, что данные заполнены
+  
+    try {
+      let csrfToken = Cookies.get('csrftoken');
+      const response = await fetch(`/api/request-threat/${reqId}/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken,
+        },
+        body: JSON.stringify({
+          threat_id: threatId,
+          price: newPrice,
+        }),
+      });
+  
+      if (response.ok) {
+        // Обновляем состояние угроз
+        setCurrentThreats((prevThreats) =>
+          prevThreats.map((threat) =>
+            threat.pk === threatId ? { ...threat, price: newPrice } : threat
+          )
+        );
+        setEditingPrice(null); // Скрываем поле редактирования
+        setNewPrice(''); // Очищаем новую цену
+      } else {
+        alert('Ошибка при обновлении стоимости');
+      }
+    } catch (error) {
+      console.error('Ошибка:', error);
+    }
+  };
+  
 
   const handleDelete = async () => {
     if (!reqId) return; // Если reqId не установлен, ничего не делаем
@@ -148,7 +191,7 @@ const RequestPage = () => {
           'X-CSRFToken': csrfToken,
         }
       });
-      /*const response = await fetch(`/api/requests/form/${reqId}/`, {
+      /*const response = await fetch(/api/requests/form/${reqId}/, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -159,7 +202,7 @@ const RequestPage = () => {
         setCurrentThreats([]); // Очищаем угрозы после удаления
         dispatch(setCurrentRequestId(null));
         dispatch(setCurrentCount(0));
-        navigate(`/threats`)
+        navigate('/threats')
       } else {
         alert('Ошибка при удалении запроса');
       }
@@ -241,7 +284,32 @@ const RequestPage = () => {
                       <tr>
                         <td>{threat.threat_name}</td>
                         <td>{threat.company_name|| 'Не указана'}</td>
-                        <td>{threat.price} ₽</td>
+                        <td
+  onClick={() => status === 'draft' && handleEditPrice(threat.pk, threat.price)}
+  style={{ cursor: status === 'draft' ? 'pointer' : 'default' }}
+>
+  {editingPrice === threat.pk ? (
+    <input
+      type="number"
+      value={newPrice}
+      onChange={(e) => setNewPrice(e.target.value)}
+      onBlur={() => handleSavePrice(threat.pk)} // Сохранение при снятии фокуса
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') handleSavePrice(threat.pk); // Сохранение при нажатии Enter
+      }}
+      min="0"
+      style={{
+        width: '80px',
+        backgroundColor: '#2a2a2a',
+        color: 'white',
+        border: '1px solid #555',
+      }}
+    />
+  ) : (
+    <span>{threat.price} ₽</span>
+  )}
+</td>
+
                         <td>{threat.short_description || 'Нет комментариев'}</td>
                       </tr>
                     </tbody>
