@@ -6,6 +6,7 @@ import Breadcrumbs from './Breadcrumbs';
 import { Link } from 'react-router-dom';
 import { useNavigate} from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { api } from './api';
 import { useSelector, useDispatch } from 'react-redux';
 import { setThreats, setFilteredThreats, setInputValue, setPriceFrom, setPriceTo, setCurrentRequestId, setCurrentCount } from './redux/threatsSlice';
 
@@ -142,14 +143,19 @@ const RequestPage = () => {
 
     try {
       let csrfToken = Cookies.get('csrftoken');
-      const response = await fetch(`/api/requests/form/${reqId}/`, {
+      const response = await api.requests.formUpdate(reqId, {
+        headers: {
+          'X-CSRFToken': csrfToken,
+        }
+      });
+      /*const response = await fetch(`/api/requests/form/${reqId}/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'X-CSRFToken': csrfToken,
         }
-      });
-      if (response.ok) {
+      });*/
+      if (response.status === 200) {
         setCurrentThreats([]); // Очищаем угрозы после удаления
         dispatch(setCurrentRequestId(null));
         dispatch(setCurrentCount(0));

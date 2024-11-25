@@ -6,8 +6,6 @@ info:
 paths:
   /threats/:
     get:
-      security:
-        - cookieAuth: []
       summary: Get a list of threats
       description: Get a list of all threats, optionally filtered by price range or name.
       parameters:
@@ -31,6 +29,7 @@ paths:
           required: false
           schema:
             type: string
+
       responses:
         '200':
           description: A list of threats

@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from './redux/authSlice';
+import { api } from './api';
 import Navbar from './Navbar';
 import Breadcrumbs from './Breadcrumbs';
 import axios from 'axios';

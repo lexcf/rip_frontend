@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
+import { api } from './api';
 import Breadcrumbs from './Breadcrumbs';
 
 const RequestsPage = () => {
@@ -18,7 +19,8 @@ const RequestsPage = () => {
         setLoading(true);
         setError('');
         try {
-          const response = await axios.get('/api/requests/');
+          const response = await api.requests.requestsList()
+          //const response = await axios.get('/api/requests/');
           setRequests(response.data); // Сохраняем полученные заявки
         } catch (error) {
           console.error('Ошибка при выполнении запроса:', error);

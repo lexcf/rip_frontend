@@ -39,13 +39,7 @@ const ThreatsPage = () => {
       setLoading(true);
       setError('');
       try {
-
-        //const test = await api.threats.threatsList()
-        //console.log('test:')
-        //console.log(test);
-
-        const response = await axios.get('/api/threats/', { timeout: 2000 });
-        //const response = await api.threats.threatsList()
+        const response = await api.threats.threatsList();
         const threatsData = response.data.filter((item) => item.pk !== undefined);
         dispatch(setThreats(threatsData));
 
@@ -74,13 +68,10 @@ const ThreatsPage = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.get('/api/threats/', {
-        params: {
-          name: inputValue,
-          price_from: priceFrom,
-          price_to: priceTo,
-        },
-        timeout: 2000,
+      const response = await api.threats.threatsList({
+        name: inputValue,
+        price_from: priceFrom,
+        price_to: priceTo,
       });
       const filteredResult = response.data.filter((item) => item.pk !== undefined);
       dispatch(setThreats(filteredResult));
@@ -107,19 +98,15 @@ const ThreatsPage = () => {
     setError('');
     try {
       const csrfToken = Cookies.get('csrftoken');
-      await axios.post(
-        `/api/threats/add/${threatId}/`,
-        {},
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken,
-          },
+      await api.threats.postThreats(threatId,{},{
+        headers: {
+          'X-CSRFToken':csrfToken
         }
-      );
+      })
+      
 
       // После добавления угрозы обновляем список
-      const response = await axios.get('/api/threats/', { timeout: 2000 });
+      const response = await api.threats.threatsList();
       const threatsData = response.data.filter((item) => item.pk !== undefined);
       dispatch(setThreats(threatsData));
 
