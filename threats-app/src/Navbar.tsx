@@ -45,7 +45,6 @@ const Navbar = () => {
           <span></span>
       )}
 
-      <Link to="/" className="navbar-link">Главная</Link>
       <Link to="/threats" className="navbar-link">Угрозы</Link>
 
       {isAuthenticated ? (
