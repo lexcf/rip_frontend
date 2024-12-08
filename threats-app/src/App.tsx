@@ -9,6 +9,8 @@ import RequestsPage from './RequestsTablePage';
 import LoginPage from './LoginPage';
 import ProfilePage from './ProfilePage'
 import ModeratorThreatsPage from './ModeratorThreatsPage'
+import Page403 from './Page403';
+import Page404 from './Page404';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -68,6 +70,14 @@ function App() {
     {
       path: '/moderator/threats',
       element: <ModeratorThreatsPage />
+    },
+    {
+      path: '/403',
+      element: <Page403 />
+    },
+    {
+      path: '/404',
+      element: <Page404 />
     }
   ], { basename: '/rip_frontend' });
   

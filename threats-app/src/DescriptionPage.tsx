@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Navbar from './Navbar';
 import Breadcrumbs from './Breadcrumbs';
+import { useNavigate, Link } from 'react-router-dom';
 
 
 const defaultImageUrl = '/rip_frontend/static/network.jpg';
@@ -34,12 +35,12 @@ const mockThreats = [
   },
 ];
 
-
 const ThreatDescription = () => {
   const { threatId } = useParams();
   const [threat, setThreat] = useState(null);
   const [loading, setLoading] = useState(true); // Для отображения состояния загрузки
   const [error, setError] = useState(null); // Для обработки ошибок
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchThreat = async () => {
@@ -74,7 +75,9 @@ const ThreatDescription = () => {
   }
 
   if (error) {
+    navigate('/404');
     return <div className="text-danger text-center my-5">Ошибка: {error}</div>;
+    
   }
 
   // Если данные угрозы загружены

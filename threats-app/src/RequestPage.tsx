@@ -72,6 +72,7 @@ const RequestPage = () => {
       const response = await fetch(`/api/requests/${reqId}/`);
 
       if (!response.ok) {
+        navigate('/403')
         throw new Error('Ошибка загрузки данных! Заявка не активна или необходимо авторизоваться!');
       }
 
