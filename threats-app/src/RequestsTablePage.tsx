@@ -19,8 +19,7 @@ const RequestsPage = () => {
         setLoading(true);
         setError('');
         try {
-          const response = await api.requests.requestsList()
-          //const response = await axios.get('/api/requests/');
+          const response = await api.requests.requestsList();
           setRequests(response.data); // Сохраняем полученные заявки
         } catch (error) {
           console.error('Ошибка при выполнении запроса:', error);
@@ -66,38 +65,50 @@ const RequestsPage = () => {
         ) : error ? (
           <div className="alert alert-danger">{error}</div>
         ) : (
-          <table className="table table-dark table-bordered">
-            <thead>
-              <tr>
-                <th>Номер заявки</th>
-                <th>Статус</th>
-                <th>Дата создания</th>
-                <th>Дата формирования</th>
-                <th>Дата завершения</th>
-                <th>Модератор</th>
-                <th>Итоговая цена</th>
-                <th>Действия</th>
-              </tr>
-            </thead>
-            <tbody>
-              {requests.map((request) => (
-                <tr key={request.pk}>
-                  <td>{request.pk}</td>
-                  <td>{request.status}</td>
-                  <td>{new Date(request.created_at).toLocaleString()}</td>
-                  <td>{request.formed_at != null ? new Date(request.formed_at).toLocaleString() : ''}</td>
-                  <td>{request.ended_at != null ? new Date(request.ended_at).toLocaleString() : ''}</td>
-                  <td>{request.moderator}</td>
-                  <td>{request.final_price} ₽</td>
-                  <td>
-                    <Link to={`/requests/${request.pk}`} className="btn btn-success">
-                      Просмотр
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="row">
+            {requests.map((request) => (
+              <div className="col-12 mb-3" key={request.pk}>
+                <div className="card bg-dark text-light" style={{ maxHeight: '350px' }}>
+                  <div className="card-body">
+                    <h5 className="card-title">Заявка #{request.pk}</h5>
+                    <table className="table table-dark table-bordered">
+                      <tbody>
+                        <tr>
+                          <td><strong>Статус:</strong></td>
+                          <td>{request.status}</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Дата создания:</strong></td>
+                          <td>{new Date(request.created_at).toLocaleString()}</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Дата формирования:</strong></td>
+                          <td>{request.formed_at != null ? new Date(request.formed_at).toLocaleString() : '—'}</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Дата завершения:</strong></td>
+                          <td>{request.ended_at != null ? new Date(request.ended_at).toLocaleString() : '—'}</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Модератор:</strong></td>
+                          <td>{request.moderator}</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Итоговая цена:</strong></td>
+                          <td>{request.final_price} ₽</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div className="text-end">
+                      <Link to={`/requests/${request.pk}`} className="btn btn-success">
+                        Просмотр
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
