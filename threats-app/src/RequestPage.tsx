@@ -6,6 +6,7 @@ import Breadcrumbs from './Breadcrumbs';
 import { Link } from 'react-router-dom';
 import { useNavigate} from 'react-router-dom';
 import Cookies from 'js-cookie';
+import axios from 'axios';
 import { api } from './api';
 import { useSelector, useDispatch } from 'react-redux';
 import { setThreats, setFilteredThreats, setInputValue, setPriceFrom, setPriceTo, setCurrentRequestId, setCurrentCount } from './redux/threatsSlice';
@@ -94,39 +95,37 @@ const RequestPage = () => {
   };
 
   const handleSavePrice = async (threatId) => {
-    if (!reqId || !threatId || newPrice === '') return; // Проверяем, что данные заполнены
-  
-    try {
-      let csrfToken = Cookies.get('csrftoken');
-      const response = await fetch(`/api/request-threat/${reqId}/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken,
-        },
-        body: JSON.stringify({
-          threat_id: threatId,
-          price: newPrice,
-        }),
-      });
-  
-      if (response.ok) {
-        // Обновляем состояние угроз
-        setCurrentThreats((prevThreats) =>
-          prevThreats.map((threat) =>
-            threat.pk === threatId ? { ...threat, price: newPrice } : threat
-          )
-        );
-        setEditingPrice(null); // Скрываем поле редактирования
-        setNewPrice(''); // Очищаем новую цену
-      } else {
-        alert('Ошибка при обновлении стоимости');
+  if (!reqId || !threatId || newPrice === '') return; // Проверяем, что данные заполнены
+
+  try {
+    let csrfToken = Cookies.get('csrftoken');
+    const response = await axios.put(`/api/request-threat/${reqId}/`, {
+      threat_id: threatId,
+      price: newPrice,
+    },{
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
       }
-    } catch (error) {
-      console.error('Ошибка:', error);
+    });
+
+    if (response.status === 200) {
+      // Обновляем состояние угроз
+      setCurrentThreats((prevThreats) =>
+        prevThreats.map((threat) =>
+          threat.pk === threatId ? { ...threat, price: newPrice } : threat
+        )
+      );
+      setEditingPrice(null); // Скрываем поле редактирования
+      setNewPrice(''); // Очищаем новую цену
+    } else {
+      alert('Ошибка при обновлении стоимости');
     }
-  };
-  
+  } catch (error) {
+    console.error('Ошибка:', error);
+  }
+};
+
 
   const handleDelete = async () => {
     if (!reqId) return; // Если reqId не установлен, ничего не делаем
