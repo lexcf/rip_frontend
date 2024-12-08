@@ -9,9 +9,9 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  isAuthenticated: localStorage.getItem('username') && Cookies.get('sessionid') ? true : false,
-  username: localStorage.getItem('username') || null,
-  is_staff: localStorage.getItem('is_staff') ? true : false,
+  isAuthenticated: false,
+  username: null,
+  is_staff: false,
 };
 
 const authSlice = createSlice({
@@ -23,17 +23,12 @@ const authSlice = createSlice({
       state.username = action.payload.username;
       state.is_staff = action.payload.is_staff;
 
-      // Сохраняем username в localStorage
-      localStorage.setItem('username', action.payload.username);
-      localStorage.setItem('is_staff', action.payload.is_staff);
+      
     },
     logout: (state) => {
       state.isAuthenticated = false;
       state.username = null;
       state.is_staff = false;
-
-      // Удаляем username из localStorage при выходе
-      localStorage.removeItem('username');
     },
   },
 });
