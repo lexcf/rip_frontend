@@ -59,7 +59,6 @@ const Navbar = () => {
       {isAuthenticated && !is_staff? (
         <>
           <Link to="/requests" className="navbar-link">Заявки</Link>
-          <Link to="/threats" onClick={handleLogout} className="navbar-link">Выход</Link>
         </>
       ) : (
         <></>

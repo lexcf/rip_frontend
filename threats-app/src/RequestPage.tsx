@@ -11,6 +11,7 @@ import { api } from './api';
 import { useSelector, useDispatch } from 'react-redux';
 import { setThreats, setFilteredThreats, setInputValue, setPriceFrom, setPriceTo, setCurrentRequestId, setCurrentCount } from './redux/threatsSlice';
 
+
 // Мок-данные для заявок
 const mockRequests = [
   {
@@ -60,6 +61,8 @@ const RequestPage = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { isAuthenticated, username, is_staff } = useSelector((state) => state.auth); // Получаем данные о пользователе из Redux состояния
 
 
   const fetchRequestData = async () => {
@@ -253,15 +256,15 @@ const RequestPage = () => {
 
       <Breadcrumbs />
       <div className="request-buttons" style={{gap: '2%'}}>
-        {status === 'draft' && (
+        {status === 'draft' &&(
           <button onClick={handleConfirmRequest} className="btn btn-success">
             Подтвердить заявку
           </button>
         )}
         {status === 'draft' && (
-          <button onClick={handleDelete} className="btn btn-danger">
-            Удалить
-          </button>
+            <button onClick={handleDelete} className="btn btn-danger">
+              Удалить
+            </button>
         )}
       </div>
 
