@@ -18,28 +18,33 @@ const ModeratorRequestsPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let intervalId;
+  
     const fetchRequests = async () => {
-      setLoading(true);
-      setError('');
-      
-      const params = {};
-      if (startDate) params.date_from = startDate;
-      if (endDate) params.date_to = endDate;
-      if (status) params.status = status;
-
       try {
+        const params = {};
+        if (startDate) params.date_from = startDate;
+        if (endDate) params.date_to = endDate;
+        if (status) params.status = status;
+  
         const response = await axios.get('/api/requests/', { params });
         setRequests(response.data);
       } catch (error) {
         console.error('Ошибка при загрузке заявок:', error);
         setError('Ошибка при загрузке заявок');
-      } finally {
-        setLoading(false);
       }
     };
-
+  
+    // Начальная загрузка данных
     fetchRequests();
+  
+    // Short polling: обновляем данные каждые 10 секунд
+    intervalId = setInterval(fetchRequests, 2000);
+  
+    // Очищаем интервал при размонтировании компонента
+    return () => clearInterval(intervalId);
   }, [startDate, endDate, status]);
+  
 
   useEffect(() => {
     const filtered = requests.filter((request) => {
