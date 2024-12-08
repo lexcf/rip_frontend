@@ -50,14 +50,23 @@ const Navbar = () => {
       {is_staff ? (
         <>
             <Link to="/moderator/threats" className="navbar-link">Управление угрозами</Link>
+            <Link to="/moderator/requests" className="navbar-link">Управление заявками</Link>
         </>
         ) : (
           <></>
         )}
 
-      {isAuthenticated ? (
+      {isAuthenticated && !is_staff? (
         <>
           <Link to="/requests" className="navbar-link">Заявки</Link>
+          <Link to="/threats" onClick={handleLogout} className="navbar-link">Выход</Link>
+        </>
+      ) : (
+        <></>
+      )}
+
+      {isAuthenticated? (
+        <>
           <Link to="/threats" onClick={handleLogout} className="navbar-link">Выход</Link>
         </>
       ) : (

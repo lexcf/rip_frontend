@@ -11,6 +11,7 @@ import ProfilePage from './ProfilePage'
 import ModeratorThreatsPage from './ModeratorThreatsPage'
 import Page403 from './Page403';
 import Page404 from './Page404';
+import ModeratorRequestsPage from './ModeratorRequestsPage';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -70,6 +71,10 @@ function App() {
     {
       path: '/moderator/threats',
       element: <ModeratorThreatsPage />
+    },
+    {
+      path: '/moderator/requests',
+      element: <ModeratorRequestsPage />
     },
     {
       path: '/403',
