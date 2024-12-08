@@ -8,6 +8,7 @@ import RegisterPage from './RegisterPage';
 import RequestsPage from './RequestsTablePage';
 import LoginPage from './LoginPage';
 import ProfilePage from './ProfilePage'
+import ModeratorThreatsPage from './ModeratorThreatsPage'
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -63,6 +64,10 @@ function App() {
     {
       path: '/login',
       element: <LoginPage />
+    },
+    {
+      path: '/moderator/threats',
+      element: <ModeratorThreatsPage />
     }
   ], { basename: '/rip_frontend' });
   

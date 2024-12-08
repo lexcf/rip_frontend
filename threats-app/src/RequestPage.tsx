@@ -284,30 +284,30 @@ const RequestPage = () => {
                         <td>{threat.threat_name}</td>
                         <td>{threat.company_name|| 'Не указана'}</td>
                         <td
-  onClick={() => status === 'draft' && handleEditPrice(threat.pk, threat.price)}
-  style={{ cursor: status === 'draft' ? 'pointer' : 'default' }}
->
-  {editingPrice === threat.pk ? (
-    <input
-      type="number"
-      value={newPrice}
-      onChange={(e) => setNewPrice(e.target.value)}
-      onBlur={() => handleSavePrice(threat.pk)} // Сохранение при снятии фокуса
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') handleSavePrice(threat.pk); // Сохранение при нажатии Enter
-      }}
-      min="0"
-      style={{
-        width: '80px',
-        backgroundColor: '#2a2a2a',
-        color: 'white',
-        border: '1px solid #555',
-      }}
-    />
-  ) : (
-    <span>{threat.price} ₽</span>
-  )}
-</td>
+                          onClick={() => status === 'draft' && handleEditPrice(threat.pk, threat.price)}
+                          style={{ cursor: status === 'draft' ? 'pointer' : 'default' }}
+                        >
+                          {editingPrice === threat.pk ? (
+                            <input
+                              type="number"
+                              value={newPrice}
+                              onChange={(e) => setNewPrice(e.target.value)}
+                              onBlur={() => handleSavePrice(threat.pk)} // Сохранение при снятии фокуса
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSavePrice(threat.pk); // Сохранение при нажатии Enter
+                              }}
+                              min="0"
+                              style={{
+                                width: '80px',
+                                backgroundColor: '#2a2a2a',
+                                color: 'white',
+                                border: '1px solid #555',
+                              }}
+                            />
+                          ) : (
+                            <span>{threat.price} ₽</span>
+                          )}
+                        </td>
 
                         <td>{threat.short_description || 'Нет комментариев'}</td>
                       </tr>

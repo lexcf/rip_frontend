@@ -9,7 +9,7 @@ import './App.css'; // Импортируем стили для navbar
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, username } = useSelector((state) => state.auth); // Получаем данные о пользователе из Redux состояния
+  const { isAuthenticated, username, is_staff } = useSelector((state) => state.auth); // Получаем данные о пользователе из Redux состояния
 
   const handleLogout = async (e) => {
     e.preventDefault();
@@ -46,6 +46,14 @@ const Navbar = () => {
       )}
 
       <Link to="/threats" className="navbar-link">Угрозы</Link>
+
+      {is_staff ? (
+        <>
+            <Link to="/moderator/threats" className="navbar-link">Управление угрозами</Link>
+        </>
+        ) : (
+          <></>
+        )}
 
       {isAuthenticated ? (
         <>

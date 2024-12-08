@@ -12,7 +12,9 @@ const Breadcrumbs = () => {
     'requests': 'Заявки',
     'description': 'Описание',
     'login': 'Вход',
-    'register': 'Регистрация'
+    'register': 'Регистрация',
+    'moderator': 'Модератор',
+    'profile': 'Профиль'
   };
 
   return (
