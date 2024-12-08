@@ -45,11 +45,11 @@ const ThreatsPage = () => {
 
         // Проверяем, существует ли заявка
         const requestData = response.data.find((item) => item.request);
-        console.log('qs');
-        console.log(requestData)
         if (requestData?.request?.pk) {
           dispatch(setCurrentRequestId(requestData.request.pk));
           dispatch(setCurrentCount(requestData.request.threats_amount));
+        } else {
+          dispatch(setCurrentCount(0));
         }
       } catch (error) {
         console.error('Ошибка при загрузке данных угроз:', error);
