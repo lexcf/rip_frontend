@@ -14,7 +14,9 @@ const Breadcrumbs = () => {
     'login': 'Вход',
     'register': 'Регистрация',
     'moderator': 'Модератор',
-    'profile': 'Профиль'
+    'profile': 'Профиль',
+    'edit': 'Редактирование',
+    'new': 'Создание'
   };
 
   return (

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from './api';
 import Cookies from 'js-cookie';
 import Navbar from './Navbar';
+import Breadcrumbs from './Breadcrumbs';
 
 const ModeratorRequestsPage = () => {
   const [loading, setLoading] = useState(false);
@@ -96,6 +97,8 @@ const ModeratorRequestsPage = () => {
         <Link to="/" className="text-light fs-4 header-text">Мониторинг угроз</Link>
         <Navbar />
       </header>
+
+      <Breadcrumbs />
 
 
       <div className="container my-4">

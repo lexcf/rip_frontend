@@ -34,6 +34,7 @@ const ThreatsPage = () => {
   } = useSelector((state) => state.threats);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { isAuthenticated, username, is_staff } = useSelector((state) => state.auth); // Получаем данные о пользователе из Redux состояния
 
   // Fetch threats on mount
   useEffect(() => {
@@ -166,17 +167,22 @@ const ThreatsPage = () => {
                       <h5 className="card-title">{threat.threat_name}</h5>
                       <p className="card-text">{threat.short_description}</p>
                     </div>
-                    <div className="card-footer text-center">
-                      <button
-                        className="btn btn-outline-success"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleAddThreat(threat.pk);
-                        }}
-                      >
-                        Добавить
-                      </button>
-                    </div>
+                    {!is_staff ? (
+                        <div className="card-footer text-center">
+                        <button
+                          className="btn btn-outline-success"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleAddThreat(threat.pk);
+                          }}
+                        >
+                          Добавить
+                        </button>
+                      </div>
+                    ): (
+                      <div></div>
+                    )}
+                    
                   </div>
                 </Link>
               </div>

@@ -12,6 +12,7 @@ import ModeratorThreatsPage from './ModeratorThreatsPage'
 import Page403 from './Page403';
 import Page404 from './Page404';
 import ModeratorRequestsPage from './ModeratorRequestsPage';
+import ThreatFormPage from './ThreatFormPage';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -77,13 +78,21 @@ function App() {
       element: <ModeratorRequestsPage />
     },
     {
+      path: '/moderator/threats/new',
+      element: <ThreatFormPage />
+    },
+    {
+      path: '/moderator/threats/edit/:id',
+      element: <ThreatFormPage />
+    },
+    {
       path: '/403',
       element: <Page403 />
     },
     {
       path: '/404',
       element: <Page404 />
-    }
+    },
   ], { basename: '/rip_frontend' });
   
   // Service Worker registration

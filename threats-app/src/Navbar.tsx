@@ -35,7 +35,8 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar">
+    <nav className="navbar" style={is_staff ? { marginRight: '35%' } : {}}>
+    
 
       {isAuthenticated ? (
         <>
