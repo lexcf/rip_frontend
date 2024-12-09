@@ -132,7 +132,7 @@ const ModeratorRequestsPage = () => {
               <option value="">Все статусы</option>
               <option value="formed">Сформирована</option>
               <option value="ended">Завершена</option>
-              <option value="rejected">Отклонена</option>
+              <option value="declined">Отклонена</option>
             </select>
           </div>
           <div className="col">
