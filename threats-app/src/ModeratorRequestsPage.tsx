@@ -38,7 +38,7 @@ const ModeratorRequestsPage = () => {
     // Начальная загрузка данных
     fetchRequests();
   
-    // Short polling: обновляем данные каждые 10 секунд
+    // Short polling
     intervalId = setInterval(fetchRequests, 2000);
   
     // Очищаем интервал при размонтировании компонента

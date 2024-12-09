@@ -1,5 +1,6 @@
 // src/redux/threatsSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axios from 'axios';
 
 const initialState = {
   inputValue: '',
@@ -9,7 +10,32 @@ const initialState = {
   filteredThreats: [],
   currentRequestId: null,
   currentCount: 0,
+  loading: false,
+  error: null,
 };
+
+// Thunk for fetching threats
+export const fetchThreats = createAsyncThunk(
+  'threats/fetchThreats',
+  async (filters, { rejectWithValue }) => {
+    try {
+      const { inputValue, priceFrom, priceTo } = filters || {};
+      const params = {};
+
+      if (inputValue) params.name = inputValue;
+      if (priceFrom) params.price_from = priceFrom;
+      if (priceTo) params.price_to = priceTo;
+
+      const response = await axios.get('/api/threats/', { params });
+
+      const threatsData = response.data.filter((item) => item.pk !== undefined);
+
+      return threatsData;
+    } catch (error) {
+      return rejectWithValue('Ошибка при загрузке угроз');
+    }
+  }
+);
 
 const threatsSlice = createSlice({
   name: 'threats',
@@ -37,6 +63,22 @@ const threatsSlice = createSlice({
     setCurrentCount: (state, action) => {
       state.currentCount = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchThreats.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchThreats.fulfilled, (state, action) => {
+        state.loading = false;
+        state.threats = action.payload;
+        state.filteredThreats = action.payload;
+      })
+      .addCase(fetchThreats.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 

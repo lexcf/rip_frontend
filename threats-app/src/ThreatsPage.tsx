@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useNavigate, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
+  fetchThreats,
   setThreats,
   setFilteredThreats,
   setInputValue,
@@ -34,64 +35,14 @@ const ThreatsPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Fetch threats on mount
   useEffect(() => {
-    const fetchThreats = async () => {
-      setLoading(true);
-      setError('');
-      try {
-        const response = await api.threats.threatsList();
-        const threatsData = response.data.filter((item) => item.pk !== undefined);
-        dispatch(setThreats(threatsData));
-
-        // Проверяем, существует ли заявка
-        const requestData = response.data.find((item) => item.request);
-        if (requestData?.request?.pk) {
-          dispatch(setCurrentRequestId(requestData.request.pk));
-          dispatch(setCurrentCount(requestData.request.threats_amount));
-        } else {
-          dispatch(setCurrentCount(0));
-        }
-      } catch (error) {
-        console.error('Ошибка при загрузке данных угроз:', error);
-        setError('Ошибка при загрузке данных угроз');
-        dispatch(setThreats([]));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchThreats();
+    dispatch(fetchThreats());
   }, [dispatch]);
 
-  const handleSearchSubmit = async (e) => {
+  const handleSearchSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-    try {
-      const response = await api.threats.threatsList({
-        name: inputValue,
-        price_from: priceFrom,
-        price_to: priceTo,
-      });
-      const filteredResult = response.data.filter((item) => item.pk !== undefined);
-      dispatch(setThreats(filteredResult));
-    } catch (error) {
-      console.error('Ошибка при выполнении поиска:', error);
-      setError('Ошибка при выполнении поиска. Используется локальный поиск.');
-
-      const filteredLocalThreats = threats.filter((threat) => {
-        const matchesName = inputValue
-          ? threat.threat_name.toLowerCase().includes(inputValue.toLowerCase())
-          : true;
-        const matchesPriceFrom = priceFrom ? threat.price >= priceFrom : true;
-        const matchesPriceTo = priceTo ? threat.price <= priceTo : true;
-        return matchesName && matchesPriceFrom && matchesPriceTo;
-      });
-
-      dispatch(setThreats(filteredLocalThreats)); // Локальный поиск
-    } finally {
-      setLoading(false);
-    }
+    dispatch(fetchThreats({ inputValue, priceFrom, priceTo }));
   };
 
   const handleAddThreat = async (threatId) => {
