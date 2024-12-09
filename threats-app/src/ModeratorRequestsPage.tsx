@@ -91,6 +91,13 @@ const ModeratorRequestsPage = () => {
     }
   };
 
+  // Маппинг статусов
+  const statusLabels = {
+    formed: 'Сформирована',
+    ended: 'Завершена',
+    declined: 'Отклонена',
+  };
+
   return (
     <div className="container-fluid bg-dark text-light min-vh-100">
       <header className="d-flex justify-content-between align-items-center px-5 py-3 site-header" style={{ backgroundColor: '#333', height: '70%', maxHeight: '60px', width: '1990px', marginLeft: '-30px' }}>
@@ -181,10 +188,10 @@ const ModeratorRequestsPage = () => {
                     <td>{request.pk}</td>
                     <td>{request.username}</td>
                     <td>{new Date(request.created_at).toLocaleDateString()}</td>
-                    <td>{request.status}</td>
+                    <td>{statusLabels[request.status] || request.status}</td>
                     <td>{request.final_price || 'N/A'}</td>
                     <td>{request.moderator || 'N/A'}</td>
-                    <td style={{ width: '400px' }}>
+                    <td style={{ width: 'auto', textAlign: 'center' }}>
                       <button
                         className="btn btn-info me-2"
                         onClick={() => handleViewRequest(request.pk)}
