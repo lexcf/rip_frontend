@@ -29,7 +29,7 @@ const RequestsPage = () => {
 
     const fetchRequests = async () => {
       try {
-        setLoading(true);
+        //setLoading(true);
         setError('');
         const params = {};
         if (startDate) params.date_from = startDate;
@@ -43,7 +43,7 @@ const RequestsPage = () => {
         console.error('Ошибка при загрузке заявок:', error);
         setError('Ошибка при загрузке заявок');
       } finally {
-        setLoading(false);
+        //setLoading(false);
       }
     };
 
