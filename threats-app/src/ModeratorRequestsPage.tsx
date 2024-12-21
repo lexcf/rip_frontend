@@ -12,6 +12,7 @@ const ModeratorRequestsPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [requests, setRequests] = useState([]);
+  const [filteredRequests, setFilteredRequests] = useState([]);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [status, setStatus] = useState('');
@@ -23,6 +24,8 @@ const ModeratorRequestsPage = () => {
 
     const fetchRequests = async () => {
       try {
+        setLoading(true);
+        setError('');
         const params = {};
         if (startDate) params.date_from = startDate;
         if (endDate) params.date_to = endDate;
@@ -30,9 +33,12 @@ const ModeratorRequestsPage = () => {
 
         const response = await axios.get('/api/requests/', { params });
         setRequests(response.data);
+        setFilteredRequests(response.data); // Изначально отображаем все данные
       } catch (error) {
         console.error('Ошибка при загрузке заявок:', error);
         setError('Ошибка при загрузке заявок');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -47,14 +53,12 @@ const ModeratorRequestsPage = () => {
   }, [startDate, endDate, status]);
 
   useEffect(() => {
-    const filtered = requests.filter((request) => {
-      const matchCreator = creator
-        ? request.username.toLowerCase().includes(creator.toLowerCase())
-        : true;
-      return matchCreator;
-    });
-    setRequests(filtered);
-  }, [creator]);
+    // Фильтрация заявок по создателю
+    const filtered = requests.filter((request) =>
+      creator ? request.username.toLowerCase().includes(creator.toLowerCase()) : true
+    );
+    setFilteredRequests(filtered);
+  }, [creator, requests]);
 
   const handleViewRequest = (requestId) => {
     navigate(`/requests/${requestId}`);
@@ -90,7 +94,6 @@ const ModeratorRequestsPage = () => {
     }
   };
 
-  // Маппинг статусов
   const statusLabels = {
     formed: 'Сформирована',
     ended: 'Завершена',
@@ -168,59 +171,58 @@ const ModeratorRequestsPage = () => {
           <div className="alert alert-danger">{error}</div>
         ) : (
           <div className="d-flex flex-column gap-3">
-            {requests.map((request) => (
-              <div className="card bg-dark text-light w-100"  style={{maxHeight: '200px'}}>
-              <div className="card-header">
-                <h5 className="card-title">Заявка #{request.pk}</h5>
+            {filteredRequests.map((request) => (
+              <div className="card bg-dark text-light w-100" style={{ maxHeight: '200px' }}>
+                <div className="card-header">
+                  <h5 className="card-title">Заявка #{request.pk}</h5>
+                </div>
+                <div className="card-body">
+                  <table className="table table-dark mb-0">
+                    <thead>
+                      <tr>
+                        <th>Создатель</th>
+                        <th>Дата</th>
+                        <th>Статус</th>
+                        <th>Итоговая цена</th>
+                        <th>Модератор</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{request.username}</td>
+                        <td>{new Date(request.formed_at).toLocaleDateString('en-US', { timeZone: 'UTC' })}</td>
+                        <td>{statusLabels[request.status] || request.status}</td>
+                        <td>{request.final_price || 'N/A'}</td>
+                        <td>{request.moderator || 'N/A'}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="card-footer d-flex justify-content-end gap-2">
+                  <button
+                    className="btn btn-info"
+                    onClick={() => handleViewRequest(request.pk)}
+                  >
+                    Просмотреть
+                  </button>
+                  {request.status === 'formed' && (
+                    <>
+                      <button
+                        className="btn btn-warning"
+                        onClick={() => handleStatusChange(request.pk, 'ended')}
+                      >
+                        Завершить
+                      </button>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => handleRejectRequest(request.pk)}
+                      >
+                        Отклонить
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className="card-body">
-                <table className="table table-dark mb-0">
-                  <thead>
-                    <tr>
-                      <th>Создатель</th>
-                      <th>Дата</th>
-                      <th>Статус</th>
-                      <th>Итоговая цена</th>
-                      <th>Модератор</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{request.username}</td>
-                      <td>{new Date(request.formed_at).toLocaleDateString('en-US', { timeZone: 'UTC' })}</td>
-                      <td>{statusLabels[request.status] || request.status}</td>
-                      <td>{request.final_price || 'N/A'}</td>
-                      <td>{request.moderator || 'N/A'}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div className="card-footer d-flex justify-content-end gap-2">
-                <button
-                  className="btn btn-info"
-                  onClick={() => handleViewRequest(request.pk)}
-                >
-                  Просмотреть
-                </button>
-                {request.status === 'formed' && (
-                  <>
-                    <button
-                      className="btn btn-warning"
-                      onClick={() => handleStatusChange(request.pk, 'ended')}
-                    >
-                      Завершить
-                    </button>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleRejectRequest(request.pk)}
-                    >
-                      Отклонить
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-            
             ))}
           </div>
         )}
