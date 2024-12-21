@@ -75,7 +75,7 @@ function App() {
     },
     {
       path: '/moderator/requests',
-      element: <ModeratorRequestsPage />
+      element: <RequestsPage />
     },
     {
       path: '/moderator/threats/new',

@@ -1,61 +1,171 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import Navbar from './Navbar';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { api } from './api';
+import Cookies from 'js-cookie';
+import Navbar from './Navbar';
 import Breadcrumbs from './Breadcrumbs';
 
 const RequestsPage = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true); // Состояние для анимации загрузки
-  const [error, setError] = useState(''); // Состояние для обработки ошибок
-  const { isAuthenticated } = useSelector((state) => state.auth); // Проверка на авторизацию
+  const [filteredRequests, setFilteredRequests] = useState([]);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [status, setStatus] = useState('');
+  const [creator, setCreator] = useState('');
+  const navigate = useNavigate();
+
+  // Получаем информацию о пользователе из состояния
+  const { isAuthenticated, is_staff } = useSelector((state) => state.auth);
+  const isModerator = is_staff; // Проверка, является ли пользователь модератором
 
   useEffect(() => {
-    if (isAuthenticated) {
-      const fetchRequests = async () => {
+    let intervalId;
+
+    const fetchRequests = async () => {
+      try {
         setLoading(true);
         setError('');
-        try {
-          const response = await api.requests.requestsList();
-          setRequests(response.data); // Сохраняем полученные заявки
-        } catch (error) {
-          console.error('Ошибка при выполнении запроса:', error);
-          setError('Ошибка при загрузке заявок');
-        } finally {
-          setLoading(false);
-        }
-      };
+        const params = {};
+        if (startDate) params.date_from = startDate;
+        if (endDate) params.date_to = endDate;
+        if (status) params.status = status;
 
-      fetchRequests();
+        const response = await axios.get('/api/requests/', { params });
+        setRequests(response.data);
+        setFilteredRequests(response.data); // Изначально отображаем все данные
+      } catch (error) {
+        console.error('Ошибка при загрузке заявок:', error);
+        setError('Ошибка при загрузке заявок');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Начальная загрузка данных
+    fetchRequests();
+
+    // Short polling (обновление данных каждые 2 секунды)
+    intervalId = setInterval(fetchRequests, 2000);
+
+    // Очищаем интервал при размонтировании компонента
+    return () => clearInterval(intervalId);
+  }, [startDate, endDate, status]);
+
+  useEffect(() => {
+    // Фильтрация заявок по создателю
+    const filtered = requests.filter((request) =>
+      creator ? request.username.toLowerCase().includes(creator.toLowerCase()) : true
+    );
+    setFilteredRequests(filtered);
+  }, [creator, requests]);
+
+  const handleViewRequest = (requestId) => {
+    navigate(`/requests/${requestId}`);
+  };
+
+  const handleStatusChange = async (requestId, newStatus) => {
+    try {
+      await api.requests.moderateUpdate(
+        requestId,
+        { accept: true },
+        { headers: { 'X-CSRFToken': Cookies.get('csrftoken') } }
+      );
+      const response = await axios.get('/api/requests/');
+      setRequests(response.data);
+    } catch (error) {
+      console.error('Ошибка при смене статуса заявки:', error);
+      setError('Ошибка при смене статуса заявки');
     }
-  }, [isAuthenticated]);
+  };
+
+  const handleRejectRequest = async (requestId) => {
+    try {
+      await api.requests.moderateUpdate(
+        requestId,
+        { accept: false },
+        { headers: { 'X-CSRFToken': Cookies.get('csrftoken') } }
+      );
+      const response = await axios.get('/api/requests/');
+      setRequests(response.data);
+    } catch (error) {
+      console.error('Ошибка при отклонении заявки:', error);
+      setError('Ошибка при отклонении заявки');
+    }
+  };
+
+  const statusLabels = {
+    formed: 'Сформирована',
+    ended: 'Завершена',
+    declined: 'Отклонена',
+  };
 
   return (
     <div className="container-fluid bg-dark text-light min-vh-100">
-      <header
-        className="d-flex justify-content-between align-items-center px-5 py-3 site-header"
-        style={{
-          backgroundColor: '#333',
-          height: '70%',
-          maxHeight: '60px',
-          width: '1990px',
-          marginLeft: '-30px',
-        }}
-      >
-        <Link to="/" className="text-light fs-4 header-text">
-          Мониторинг угроз
-        </Link>
+      <header className="d-flex justify-content-between align-items-center px-5 py-3 site-header" style={{ backgroundColor: '#333', height: '70%', maxHeight: '60px', width: '1990px', marginLeft: '-30px' }}>
+        <Link to="/" className="text-light fs-4 header-text">Мониторинг угроз</Link>
         <Navbar />
       </header>
 
       <Breadcrumbs />
 
       <div className="container my-4">
-        <h2 className="mb-4">Мои заявки</h2>
+        <h2>Фильтрация заявок</h2>
+        <form className="row g-3 align-items-center">
+          <div className="col">
+            <label htmlFor="startDate" className="form-label">Дата начала</label>
+            <input
+              type="date"
+              id="startDate"
+              className="form-control"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
+          <div className="col">
+            <label htmlFor="endDate" className="form-label">Дата окончания</label>
+            <input
+              type="date"
+              id="endDate"
+              className="form-control"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </div>
+          <div className="col">
+            <label htmlFor="status" className="form-label">Статус</label>
+            <select
+              id="status"
+              className="form-select"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+            >
+              <option value="">Все статусы</option>
+              <option value="formed">Сформирована</option>
+              <option value="ended">Завершена</option>
+              <option value="declined">Отклонена</option>
+            </select>
+          </div>
+          <div className="col">
+            <label htmlFor="creator" className="form-label">Создатель</label>
+            <input
+              type="text"
+              id="creator"
+              className="form-control"
+              placeholder="Поиск по создателю"
+              value={creator}
+              onChange={(e) => setCreator(e.target.value)}
+            />
+          </div>
+        </form>
+      </div>
 
+      <div className="container">
         {loading ? (
           <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
             <div className="spinner-border text-light" role="status">
@@ -65,46 +175,57 @@ const RequestsPage = () => {
         ) : error ? (
           <div className="alert alert-danger">{error}</div>
         ) : (
-          <div className="row">
-            {requests.map((request) => (
-              <div className="col-12 mb-3" key={request.pk}>
-                <div className="card bg-dark text-light" style={{ maxHeight: '350px' }}>
-                  <div className="card-body">
-                    <h5 className="card-title">Заявка #{request.pk}</h5>
-                    <table className="table table-dark table-bordered">
-                      <tbody>
-                        <tr>
-                          <td><strong>Статус:</strong></td>
-                          <td>{request.status}</td>
-                        </tr>
-                        <tr>
-                          <td><strong>Дата создания:</strong></td>
-                          <td>{new Date(request.created_at).toLocaleString()}</td>
-                        </tr>
-                        <tr>
-                          <td><strong>Дата формирования:</strong></td>
-                          <td>{request.formed_at != null ? new Date(request.formed_at).toLocaleString() : '—'}</td>
-                        </tr>
-                        <tr>
-                          <td><strong>Дата завершения:</strong></td>
-                          <td>{request.ended_at != null ? new Date(request.ended_at).toLocaleString() : '—'}</td>
-                        </tr>
-                        <tr>
-                          <td><strong>Модератор:</strong></td>
-                          <td>{request.moderator}</td>
-                        </tr>
-                        <tr>
-                          <td><strong>Итоговая цена:</strong></td>
-                          <td>{request.final_price} ₽</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <div className="text-end">
-                      <Link to={`/requests/${request.pk}`} className="btn btn-success">
-                        Просмотр
-                      </Link>
-                    </div>
-                  </div>
+          <div className="d-flex flex-column gap-3">
+            {filteredRequests.map((request) => (
+              <div className="card bg-dark text-light w-100" style={{ maxHeight: '200px' }}>
+                <div className="card-header">
+                  <h5 className="card-title">Заявка #{request.pk}</h5>
+                </div>
+                <div className="card-body">
+                  <table className="table table-dark mb-0">
+                    <thead>
+                      <tr>
+                        <th>Создатель</th>
+                        <th>Дата</th>
+                        <th>Статус</th>
+                        <th>Итоговая цена</th>
+                        <th>Модератор</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>{request.username}</td>
+                        <td>{new Date(request.formed_at).toLocaleDateString('en-US', { timeZone: 'UTC' })}</td>
+                        <td>{statusLabels[request.status] || request.status}</td>
+                        <td>{request.final_price || 'N/A'}</td>
+                        <td>{request.moderator || 'N/A'}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div className="card-footer d-flex justify-content-end gap-2">
+                  <button
+                    className="btn btn-info"
+                    onClick={() => handleViewRequest(request.pk)}
+                  >
+                    Просмотреть
+                  </button>
+                  {isModerator && request.status === 'formed' && (
+                    <>
+                      <button
+                        className="btn btn-warning"
+                        onClick={() => handleStatusChange(request.pk, 'ended')}
+                      >
+                        Завершить
+                      </button>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => handleRejectRequest(request.pk)}
+                      >
+                        Отклонить
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
