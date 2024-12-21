@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import Breadcrumbs from './Breadcrumbs';
+import axios from 'axios';
 
 const ThreatFormPage = () => {
   const { id } = useParams();
@@ -19,6 +20,7 @@ const ThreatFormPage = () => {
     price: 0,
     detections: 0,
   });
+  const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(!!id);
   const [error, setError] = useState('');
 
@@ -46,21 +48,58 @@ const ThreatFormPage = () => {
     setThreat((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (e) => {
+    console.log(e.target.files[0])
+    setImageFile(e.target.files[0]);
+  };
+
+  const uploadImage = async () => {
+    try {
+      const formData = new FormData();
+      console.log(imageFile)
+      formData.append('img_name', imageFile.name);
+      formData.append('pic', imageFile);
+      const response = await axios.post('/api/threats/image/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'X-CSRFToken': Cookies.get('csrftoken'),
+        },
+      });
+
+      if (response.status === 201) {
+        return `http://localhost:9000/static/${imageFile.name}`;
+      } else {
+        throw new Error('Ошибка при загрузке изображения');
+      }
+    } catch (err) {
+      console.error('Ошибка при загрузке изображения:', err);
+      throw new Error('Не удалось загрузить изображение.');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
     try {
+      let imageUrl = threat.img_url;
+      if (imageFile) {
+        // Сначала загружаем изображение
+        imageUrl = await uploadImage();
+      }
+
+      // Создаем или обновляем угрозу
+      const newThreat = { ...threat, img_url: imageUrl };
       if (id) {
-        // Редактирование
-        await api.threats.detailUpdate(id, threat, {
+        await api.threats.detailUpdate(id, newThreat, {
           headers: { 'X-CSRFToken': Cookies.get('csrftoken') },
         });
       } else {
-        // Создание
-        await api.threats.detailCreate(threat, {
+        await api.threats.detailCreate(newThreat, {
           headers: { 'X-CSRFToken': Cookies.get('csrftoken') },
         });
       }
+
       navigate('/moderator/threats');
     } catch (err) {
       console.error('Ошибка при сохранении угрозы:', err);
@@ -140,13 +179,12 @@ const ThreatFormPage = () => {
             />
           </div>
           <div className="mb-3">
-            <label htmlFor="img_url" className="form-label">URL изображения</label>
+            <label htmlFor="img_file" className="form-label">Изображение</label>
             <input
-              type="text"
-              id="img_url"
-              name="img_url"
-              value={threat.img_url}
-              onChange={handleChange}
+              type="file"
+              id="img_file"
+              name="img_file"
+              onChange={handleImageChange}
               className="form-control"
             />
           </div>
