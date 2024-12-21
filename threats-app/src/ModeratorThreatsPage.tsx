@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Navbar from './Navbar';
 import Breadcrumbs from './Breadcrumbs';
 import { api } from './api';
@@ -9,7 +9,6 @@ const ModeratorThreatsPage = () => {
   const [threats, setThreats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchThreats = async () => {
@@ -81,59 +80,60 @@ const ModeratorThreatsPage = () => {
         ) : error ? (
           <div className="alert alert-danger">{error}</div>
         ) : (
-          <div className="row">
-            {threats.map((threat) => (
-              <div className="col-12 mb-3" key={threat.pk}>
-              <div className="card bg-dark text-light" style={{ maxHeight: '300px', display: 'flex', flexDirection: 'row' }}>
-                {/* Текстовая часть карточки */}
-                <div className="card-body" style={{ flex: 1, paddingRight: '160px', wordWrap: 'break-word' }}>
-                  <h5 className="card-title">{threat.threat_name}</h5>
-                  <p className="card-text">
-                    <strong>Компания:</strong> {threat.company_name}
-                    <br />
-                    <strong>Описание:</strong> {threat.description}
-                    <br />
-                    <strong>Короткое описание:</strong> {threat.short_description}
-                    <br />
-                    <strong>URL картинки: </strong> {threat.img_url}
-                    <br />
-                    <strong>Цена:</strong> {threat.price} ₽
-                    <br />
-                    <strong>Обнаружений в год: </strong> {threat.detections}
-                    <br />
-                  </p>
-                  <Link
-                    to={`/moderator/threats/edit/${threat.pk}`}
-                    className="btn btn-warning me-2"
-                  >
-                    Редактировать
-                  </Link>
-                  <button
-                    onClick={() => handleDeleteThreat(threat.pk)}
-                    className="btn btn-danger"
-                  >
-                    Удалить
-                  </button>
-                </div>
-            
-                {/* Изображение угрозы */}
-                <div style={{ width: '270px', height: '270px', marginRight: '20px', marginTop: 'auto', marginBottom: 'auto' }}>
-                  <img
-                    src={threat.img_url}
-                    alt={threat.threat_name}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      borderRadius: '8px',
-                      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-            
-            ))}
+          <div className="table-responsive">
+            <table className="table table-dark table-bordered">
+              <thead>
+                <tr>
+                  <th>Название угрозы</th>
+                  <th>Компания</th>
+                  <th>Описание</th>
+                  <th>Короткое описание</th>
+                  <th>Изображение</th>
+                  <th>Цена</th>
+                  <th>Обнаружений в год</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody>
+                {threats.map((threat) => (
+                  <tr key={threat.pk}>
+                    <td>{threat.threat_name}</td>
+                    <td>{threat.company_name}</td>
+                    <td>{threat.description}</td>
+                    <td>{threat.short_description}</td>
+                    <td>
+                      <img
+                        src={threat.img_url}
+                        alt={threat.threat_name}
+                        style={{
+                          width: '100px',
+                          height: '100px',
+                          objectFit: 'cover',
+                          borderRadius: '4px',
+                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+                        }}
+                      />
+                    </td>
+                    <td>{threat.price} ₽</td>
+                    <td>{threat.detections}</td>
+                    <td>
+                      <Link
+                        to={`/moderator/threats/edit/${threat.pk}`}
+                        className="btn btn-warning me-2"
+                      >
+                        Редактировать
+                      </Link>
+                      <button
+                        onClick={() => handleDeleteThreat(threat.pk)}
+                        className="btn btn-danger"
+                      >
+                        Удалить
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
 
