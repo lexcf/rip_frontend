@@ -14,7 +14,7 @@ const initialState = {
   error: null,
 };
 
-// Thunk for fetching threats
+
 export const fetchThreats = createAsyncThunk(
   'threats/fetchThreats',
   async (filters, { rejectWithValue }) => {

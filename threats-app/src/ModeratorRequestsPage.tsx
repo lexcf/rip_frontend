@@ -20,14 +20,14 @@ const ModeratorRequestsPage = () => {
 
   useEffect(() => {
     let intervalId;
-  
+
     const fetchRequests = async () => {
       try {
         const params = {};
         if (startDate) params.date_from = startDate;
         if (endDate) params.date_to = endDate;
         if (status) params.status = status;
-  
+
         const response = await axios.get('/api/requests/', { params });
         setRequests(response.data);
       } catch (error) {
@@ -35,17 +35,16 @@ const ModeratorRequestsPage = () => {
         setError('Ошибка при загрузке заявок');
       }
     };
-  
+
     // Начальная загрузка данных
     fetchRequests();
-  
+
     // Short polling
     intervalId = setInterval(fetchRequests, 2000);
-  
+
     // Очищаем интервал при размонтировании компонента
     return () => clearInterval(intervalId);
   }, [startDate, endDate, status]);
-  
 
   useEffect(() => {
     const filtered = requests.filter((request) => {
@@ -106,7 +105,6 @@ const ModeratorRequestsPage = () => {
       </header>
 
       <Breadcrumbs />
-
 
       <div className="container my-4">
         <h2>Фильтрация заявок</h2>
@@ -169,56 +167,61 @@ const ModeratorRequestsPage = () => {
         ) : error ? (
           <div className="alert alert-danger">{error}</div>
         ) : (
-          <div className="table-responsive">
-            <table className="table table-bordered table-dark">
-              <thead>
-                <tr>
-                  <th>Заявка</th>
-                  <th>Создатель</th>
-                  <th>Дата</th>
-                  <th>Статус</th>
-                  <th>Итоговая цена</th>
-                  <th>Модератор</th>
-                  <th>Действия</th>
-                </tr>
-              </thead>
-              <tbody>
-                {requests.map((request) => (
-                  <tr key={request.pk}>
-                    <td>{request.pk}</td>
-                    <td>{request.username}</td>
-                    <td>{new Date(request.created_at).toLocaleDateString()}</td>
-                    <td>{statusLabels[request.status] || request.status}</td>
-                    <td>{request.final_price || 'N/A'}</td>
-                    <td>{request.moderator || 'N/A'}</td>
-                    <td style={{ width: 'auto', textAlign: 'center' }}>
-                      <button
-                        className="btn btn-info me-2"
-                        onClick={() => handleViewRequest(request.pk)}
-                      >
-                        Просмотреть
-                      </button>
-                      {request.status === 'formed' && (
-                        <>
-                          <button
-                            className="btn btn-warning me-2"
-                            onClick={() => handleStatusChange(request.pk, 'ended')}
-                          >
-                            Завершить
-                          </button>
-                          <button
-                            className="btn btn-danger"
-                            onClick={() => handleRejectRequest(request.pk)}
-                          >
-                            Отклонить
-                          </button>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="d-flex flex-column gap-3">
+            {requests.map((request) => (
+              <div className="card bg-dark text-light w-100"  style={{maxHeight: '200px'}}>
+              <div className="card-header">
+                <h5 className="card-title">Заявка #{request.pk}</h5>
+              </div>
+              <div className="card-body">
+                <table className="table table-dark mb-0">
+                  <thead>
+                    <tr>
+                      <th>Создатель</th>
+                      <th>Дата</th>
+                      <th>Статус</th>
+                      <th>Итоговая цена</th>
+                      <th>Модератор</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{request.username}</td>
+                      <td>{new Date(request.formed_at).toLocaleDateString('en-US', { timeZone: 'UTC' })}</td>
+                      <td>{statusLabels[request.status] || request.status}</td>
+                      <td>{request.final_price || 'N/A'}</td>
+                      <td>{request.moderator || 'N/A'}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="card-footer d-flex justify-content-end gap-2">
+                <button
+                  className="btn btn-info"
+                  onClick={() => handleViewRequest(request.pk)}
+                >
+                  Просмотреть
+                </button>
+                {request.status === 'formed' && (
+                  <>
+                    <button
+                      className="btn btn-warning"
+                      onClick={() => handleStatusChange(request.pk, 'ended')}
+                    >
+                      Завершить
+                    </button>
+                    <button
+                      className="btn btn-danger"
+                      onClick={() => handleRejectRequest(request.pk)}
+                    >
+                      Отклонить
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+            
+            ))}
           </div>
         )}
       </div>
